@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  imdb_scrapper:
+    build:
+      context: .
+      dockerfile: imdb_scrapper/Dockerfile
+    image: scrapper-0.1:imdb
+    ports: 
+      - 8000:8000  
+  stanford-nlp-pos:
+    build:
+      context: .
+      dockerfile: stanford_nlp/pos/Dockerfile
+    image: stanford-nlp-3.9.2:pos
+    ports: 
+      - 8001:8001 
+  stanford-nlp-ner:
+    build:
+      context: .
+      dockerfile: stanford_nlp/ner/Dockerfile
+    image: stanford-nlp-3.9.2:ner
+    ports: 
+      - 8002:8002 
+  imdb_pipeline:
+    build:
+      context: .
+      dockerfile: imdb_pipeline/Dockerfile
+    image: pipeline-0.1:imdb
+    ports: 
+      - 8003:8003 
+ 
