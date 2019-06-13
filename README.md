@@ -49,7 +49,13 @@
 - `stanford-nlp-3.9.2:ner`: Stanford NLP Named Entity tagger docker (as micro service)
 - store the entities and their relationships in a storage called `neo4j-3.5.5:algo-apoc`, which is a neo4j docker with APOC and ALGO libraries.
     
-3. Visualization and queries with Neo4j browser
+3. Visualization and queries with Neo4j browser, and answering a few questions
+- how the meta graph look like?
+- what are the representing features of some movies?
+- what is the number pf average votes per movie of an actor?
+- what actors, directors participated in most of the film production?
+- what actors could have worked with same directors many times (strong influence)
+
 
 #### For more information:
 - [Hands-on](/session_1/README.md)
