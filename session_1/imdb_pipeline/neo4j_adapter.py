@@ -4,7 +4,6 @@ from threading import Thread
 from neo4j.v1 import GraphDatabase, Record
 from neo4j.v1.types.graph import Node, Path, Relationship
 
-
 class Neo4jAdapter(object):
     """
     Neo4jAdapter is a data access layer over Neo4j Python Bolt driver:

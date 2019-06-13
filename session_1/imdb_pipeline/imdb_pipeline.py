@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from os import getpid, kill
 import signal
 import traceback
