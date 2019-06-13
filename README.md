@@ -25,7 +25,7 @@
 ## Session 1: *"I thought Christmas only comes once a year."*
 
 ### Business Perspectives
-- *Rumor spreading*: a case for `JOIN`-ing infinite number of tables
+- *Rumor spreading*: a case for `JOIN`-ing infinite number of SQL tables
 - 3 `Neo4j` user cases: US Army, Mosanto, and ICIJ 
 - Neo4j ecosystem
 
