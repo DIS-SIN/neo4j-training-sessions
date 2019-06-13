@@ -32,7 +32,7 @@
 ### Session Story (10 mins) - the `James Bond` movies datasets
 - A dataset of `James Bond` movies is collected by harvesting data from the `IMBD` (www.imdb.com) site and merged with a previously gathered data from `Wikipedia`. This dataset contains basic information about the movies: `IMDB` url, movie name, year of release, synopsis, `IMDB` votes, directors, and actors.
 - The dataset is sent through a data processing pipeline consisting of two `Stanford NLP` taggers - Part-of-Speech and Named Entity - to extract *Key Phrases* and *Named Entities* from the synopses.
-- All entities are persisted into a graph managed by a local *Dockerized* `Neo4j` container, creatded by using [neo4j-algo-apoc github repo](../neo4j-algo-apoc).
+- All entities are persisted into a graph managed by a local *Dockerized* `Neo4j` container, creatded by using [neo4j-algo-apoc github repo](https://github.com/DIS-SIN/neo4j-algo-apoc).
 - A few Cypher queries are used to showcase: how to aggregate data, how to find out relationships, and how to detect similarities in the dataset.
 - How can this graph database can be enriched and what purposes it might serve?
 
