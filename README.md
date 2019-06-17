@@ -42,7 +42,7 @@
 - How can this graph database can be enriched and what purposes it might serve?
 
 #### For more information:
-- [Presentation](/session_1/slide-deck)
+- [Presentation](https://www.beautiful.ai/player/-LhIka_3VR69748r-tqQ)
 
 ### Hands-on Lab (30 mins) - `the devil is in details`
 1. Get the dataset: 
