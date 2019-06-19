@@ -55,6 +55,14 @@ Remove the local graph:
 
 ![Launched neo4j_algo_apoc](images/neo4j_apoc_algo_started.png)
 
+Note that for Windows:
+- Windows Home edition does not support Docker
+- Windows Pro or Enterprise does support Docker
+
+Note that for Windows, both options can be enabled easily when running the `docker-compose up` first time. Please pay attention that Windows hide these dialogs in the background.
+- [enable Windows to share drives](https://docs.docker.com/docker-for-windows/#shared-drives)
+- [allow file sharing between Windows and the containers](https://docs.docker.com/docker-for-windows/https://docs.docker.com/docker-for-windows/#firewall-rules-for-shared-drives)
+
 Note that `-d` flag is neeeded if you want the `Neo4j` container runs detached in the background. In this case you can monitor it by using a terminal:
 
         cd $NEO4J_ALGO_APOC
