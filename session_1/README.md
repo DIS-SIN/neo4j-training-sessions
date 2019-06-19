@@ -92,7 +92,7 @@ IMPORTANT NOTE: By default the `imdb_pipeline` is using default `docker network`
 
 ![Using local IP address 192.168.1.3 in Windows](images/windows_docker_nat.png)
 
-Please use the assigned IP address to replace the default IP address of all `172.17.0.1` in `imdb_pipeline.py`.
+Please use the assigned IP address (192.168.1.3 in above example) to replace the default IP address of all `172.17.0.1` in `imdb_pipeline.py`.
 
 It is recommended that the docker containers are ran without the `-d` flag for obtaining some error messages on `stdout` in order to fix issues if any.
 
