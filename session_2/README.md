@@ -22,6 +22,6 @@ Enrichment
 
 Career graph
 
-1/Occupation classification
-3/Similar tracks
-2/Career recommendation
+1. Occupation classification
+2. Similar tracks
+3. Career recommendation
