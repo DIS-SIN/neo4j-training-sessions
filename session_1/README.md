@@ -94,6 +94,10 @@ IMPORTANT NOTE: By default the `imdb_pipeline` is using default `docker network`
 
 Please use the assigned IP address (192.168.1.3 in above example) to replace the default IP address of all `172.17.0.1` in `imdb_pipeline.py`.
 
+If needed, after modifying IP addresses, rebuild the containers:
+
+		docker-compose up --build
+
 It is recommended that the docker containers are ran without the `-d` flag for obtaining some error messages on `stdout` in order to fix issues if any.
 
 ### 1.5 Monitoring `docker` containers:
