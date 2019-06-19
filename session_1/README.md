@@ -271,8 +271,8 @@ Refere to `1.6.3`
 
 - feeding harvested and merged data into POS and NER services of Tasks 3,
     + text content feed to the service up to 4KB
-    + supported POS chunk grammar: (<NN> | <JJ>)* (<NN>| <NNS> <VBG>)+
-    + supported NER chunk grammar: (<B-[LOC|ORG|PER]>) (<I-[LOC|ORG|PER]>)*
+    + supported POS chunk grammar: `(<NN> | <JJ>)* (<NN>| <NNS> <VBG>)+`
+    + supported NER chunk grammar: `(<B-[LOC|ORG|PER]>) (<I-[LOC|ORG|PER]>)*`
 
     Extensible:
         - multiple language support by adding new dockers, one per language. Using `docker-swarm` or `Kubernetes` to spawn multiple and scalable dockers.

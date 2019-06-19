@@ -41,7 +41,7 @@ RETURN 1;
 
 CREATE CONSTRAINT ON (n:ONetOcc) ASSERT n.code IS UNIQUE;
 
-CALL apoc.load.csv('/onet/Occupation%20Data.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/Occupation%20Data.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
 WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS code, TRIM(apoc.convert.toString(list[1])) AS title, TRIM(apoc.convert.toString(list[2])) AS desc
 	WHERE lineNo > 1
 WITH code, title, desc
@@ -52,8 +52,10 @@ WITH code, title, desc
 RETURN 1;
 
 CREATE CONSTRAINT ON (n:JobTitle) ASSERT n.code IS UNIQUE;
+CREATE INDEX ON :JobTitle(name);
+CREATE INDEX ON :JobTitle(abbr);
 
-CALL apoc.load.csv('/onet/Alternate%20Titles.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/Alternate%20Titles.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
 WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS code, TRIM(apoc.convert.toString(list[1])) AS title, TRIM(apoc.convert.toString(list[2])) AS short_title
 	WHERE lineNo > 0 
 WITH code, title, short_title, '(' + short_title + ')' AS pattern
@@ -71,3 +73,73 @@ WITH code, title, short_title, norm_title
 		MERGE (jt)-[:IN_OOC]->(ooc)
 	)
 RETURN 1;
+
+CREATE CONSTRAINT ON (n:UNSPSC_Segment) ASSERT n.code IS UNIQUE;
+CREATE CONSTRAINT ON (n:UNSPSC_Family) ASSERT n.code IS UNIQUE;
+CREATE CONSTRAINT ON (n:UNSPSC_Class) ASSERT n.code IS UNIQUE;
+CREATE CONSTRAINT ON (n:UNSPSC_Commodity) ASSERT n.code IS UNIQUE;
+CREATE INDEX ON :UNSPSC_Segment(title);
+CREATE INDEX ON :UNSPSC_Family(title);
+CREATE INDEX ON :UNSPSC_Class(title);
+CREATE INDEX ON :UNSPSC_Commodity(title);
+
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/UNSPSC%20Reference.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS commodity_code, TRIM(apoc.convert.toString(list[1])) AS commodity_title, TRIM(apoc.convert.toString(list[2])) AS class_code, TRIM(apoc.convert.toString(list[3])) AS class_title, TRIM(apoc.convert.toString(list[4])) AS family_code, TRIM(apoc.convert.toString(list[5])) AS family_title, TRIM(apoc.convert.toString(list[6])) AS segment_code, TRIM(apoc.convert.toString(list[7])) AS segment_title
+	WHERE lineNo > 1
+WITH commodity_code, commodity_title, class_code, class_title, family_code, family_title, segment_code, segment_title
+	MERGE (seg:UNSPSC_Segment {code: segment_code})
+		ON CREATE SET seg.title = segment_title
+	MERGE (fam:UNSPSC_Family {code: family_code})
+		ON CREATE SET fam.title = family_title
+	MERGE (cls:UNSPSC_Class {code: class_code})
+		ON CREATE SET cls.title = class_title
+	MERGE (com:UNSPSC_Commodity {code: commodity_title})
+		ON CREATE SET com.title = commodity_title
+	MERGE (fam)-[:IN_SEG]->(seg)
+	MERGE (cls)-[:IN_FAM]->(fam)
+	MERGE (com)-[:IN_CLS]->(cls)
+RETURN 1;
+
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/UNSPSC%20Reference.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS commodity_code, TRIM(apoc.convert.toString(list[1])) AS commodity_title, TRIM(apoc.convert.toString(list[2])) AS class_code, TRIM(apoc.convert.toString(list[3])) AS class_title, TRIM(apoc.convert.toString(list[4])) AS family_code, TRIM(apoc.convert.toString(list[5])) AS family_title, TRIM(apoc.convert.toString(list[6])) AS segment_code, TRIM(apoc.convert.toString(list[7])) AS segment_title
+	WHERE lineNo > 1
+WITH commodity_code, commodity_title, class_code, class_title, family_code, family_title, segment_code, segment_title
+	MERGE (seg:UNSPSC_Segment {code: segment_code})
+		ON CREATE SET seg.title = segment_title
+	MERGE (fam:UNSPSC_Family {code: family_code})
+		ON CREATE SET fam.title = family_title
+	MERGE (cls:UNSPSC_Class {code: class_code})
+		ON CREATE SET cls.title = class_title
+	MERGE (com:UNSPSC_Commodity {code: commodity_code})
+		ON CREATE SET com.title = commodity_title
+	MERGE (fam)-[:IN_SEG]->(seg)
+	MERGE (cls)-[:IN_FAM]->(fam)
+	MERGE (com)-[:IN_CLS]->(cls)
+RETURN 1;
+
+CREATE CONSTRAINT ON (n:TechSkill) ASSERT n.name IS UNIQUE;
+
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/Technology%20Skills.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS onet_occ_code, TRIM(apoc.convert.toString(list[1])) AS tech_skill_name, TRIM(apoc.convert.toString(list[2])) AS commodity_code, TRIM(apoc.convert.toString(list[4])) AS is_hot
+	WHERE lineNo > 1
+WITH onet_occ_code, tech_skill, commodity_code, is_hot
+	MATCH (ooc:ONetOcc {code: onet_occ_code})
+	MERGE (ts:TechSkill {name: tech_skill_name})
+		ON CREATE SET ts.is_hot = is_hot
+	MERGE (com:UNSPSC_Commodity {code: commodity_code})
+	MERGE (ooc)-[:HAS_TECH_SKILL]->(ts)
+	MERGE (ts)-[:SKILL_OF_COM]->(com)
+RETURN 1;
+
+CREATE CONSTRAINT ON (n:Tool) ASSERT n.name IS UNIQUE;
+CALL apoc.load.csv('https://www.onetcenter.org/dl_files/database/db_23_3_text/Tools%20Used.txt', {header: false, sep: 'TAB'}) YIELD lineNo, list
+WITH lineNo, TRIM(apoc.convert.toString(list[0])) AS onet_occ_code, TRIM(apoc.convert.toString(list[1])) AS tool_name, TRIM(apoc.convert.toString(list[2])) AS commodity_code
+	WHERE lineNo > 1
+WITH onet_occ_code, tool_name, commodity_code
+	MATCH (ooc:ONetOcc {code: onet_occ_code})
+	MERGE (tl:Tool {name: tool_name})
+	MERGE (com:UNSPSC_Commodity {code: commodity_code})
+	MERGE (ooc)-[:USES_TOOL]->(ts)
+	MERGE (tl)-[:TOOL_OF_COM]->(com)
+RETURN 1;
+
