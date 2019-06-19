@@ -12,6 +12,11 @@
 ### Style:
 - For non-developers (30 mins): informal, enjoyable, real-life example
 - For developers (30 mins): hands-on & reproducible
+    - Step by step help attendees perfoming tasks needed for an end-to-end showcase.
+    - Providing an approach how to deal with a real-life example with a set of selective technologies and tools,properly constructed, and tested.
+    - Identifying pieces that can be reused later in related projects.
+    - Simple to reproduce so every attendee can self-repeat the hands-on whenever and wherever needed.
+    - Document well enough so it would be easy to use.
 
 ### Frequency:
 - One session per week

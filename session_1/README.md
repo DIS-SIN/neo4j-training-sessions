@@ -55,6 +55,16 @@ Remove the local graph:
 
 ![Launched neo4j_algo_apoc](images/neo4j_apoc_algo_started.png)
 
+Note that for Windows:
+- Windows Home edition does not support Docker
+- Windows Pro or Enterprise edition does support Docker
+
+Note that for Windows, both options can be enabled easily when running the `docker-compose up` first time. Please pay attention that Windows hide these dialogs in the background.
+- [enable Windows to share drives](https://docs.docker.com/docker-for-windows/#shared-drives)
+- [allow file sharing between Windows and the containers](https://docs.docker.com/docker-for-windows/https://docs.docker.com/docker-for-windows/#firewall-rules-for-shared-drives)
+
+For Windows, `git bash` is a preferred command line utility, or if you have mastered PowerShell, that can also be an option.
+
 Note that `-d` flag is neeeded if you want the `Neo4j` container runs detached in the background. In this case you can monitor it by using a terminal:
 
         cd $NEO4J_ALGO_APOC
@@ -73,8 +83,20 @@ Started the docker containers needed for the session:
 
         cd session_1
         docker-compose up
-
+	
 ![Launched `session_1` container](images/session_1_docker_compose_up.png)
+
+IMPORTANT NOTE: By default the `imdb_pipeline` is using default `docker network` at `172.17.0.1`. However this is not achieveable in Windows editions. To find out which networking interface is available for the local `Docker`, please try in a Windows terminal:
+
+		ipconfig
+
+![Using local IP address 192.168.1.3 in Windows](images/windows_docker_nat.png)
+
+Please use the assigned IP address (192.168.1.3 in above example) to replace the default IP address of all `172.17.0.1` in `imdb_pipeline.py`.
+
+If needed, after modifying IP addresses, rebuild the containers:
+
+		docker-compose up --build
 
 It is recommended that the docker containers are ran without the `-d` flag for obtaining some error messages on `stdout` in order to fix issues if any.
 
@@ -121,12 +143,23 @@ Open a terminal and type the following command to test if the `stanford-nlp-pos`
 
         echo "A passenger plane has crashed shortly after take-off from Kyrgyzstan's capital, Bishkek, killing a large number of those on board. The head of Kyrgyzstan's civil aviation authority said that out of about 90 passengers and crew, only about 20 people have survived. The Itek Air Boeing 737 took off bound for Mashhad, in north-eastern Iran, but turned round some 10 minutes later." | nc localhost 8001
 
+Note: Windows users might not find `nc` (netcat) by default. A port to Windows can be found here: [Netcat for Windows](https://joncraton.org/blog/46/netcat-for-windows/). In that case, if you unzip the downloaded app into ~/Downloads:
+
+		echo "A passenger plane has crashed shortly after take-off from Kyrgyzstan's capital, Bishkek, killing a large number of those on board. The head of Kyrgyzstan's civil aviation authority said that out of about 90 passengers and crew, only about 20 people have survived. The Itek Air Boeing 737 took off bound for Mashhad, in north-eastern Iran, but turned round some 10 minutes later." | ../../Downloads/nc/nc localhost 8001
+
 ![`stanford-nlp-pos` container status](images/stanford_nlp_pos_status.png)
 
 Open a terminal and type the following command to test if the `stanford-nlp-ner` container for running `Named Entity` tagger is ready.
 
         echo "A passenger plane has crashed shortly after take-off from Kyrgyzstan's capital, Bishkek, killing a large number of those on board. The head of Kyrgyzstan's civil aviation authority said that out of about 90 passengers and crew, only about 20 people have survived. The Itek Air Boeing 737 took off bound for Mashhad, in north-eastern Iran, but turned round some 10 minutes later." | nc localhost 8002
 
+Note: similarly with Windows `netcat` unzipped into user's `Downloads` directory:
+
+		echo "A passenger plane has crashed shortly after take-off from Kyrgyzstan's capital, Bishkek, killing a large number of those on board. The head of Kyrgyzstan's civil aviation authority said that out of about 90 passengers and crew, only about 20 people have survived. The Itek Air Boeing 737 took off bound for Mashhad, in north-eastern Iran, but turned round some 10 minutes later." | ../../Downloads/nc/nc localhost 8002
+		A/O passenger/O plane/O has/O crashed/O shortly/O after/O take-off/O from/O Kyrgyzstan/B-LOC 's/O capital/O ,/O Bishkek/B-LOC ,/O killing/O a/O large/O number/O of/O those/O on/O board/O ./O
+		The/O head/O of/O Kyrgyzstan/B-LOC 's/O civil/O aviation/O authority/O said/O that/O out/O of/O about/O 90/O passengers/O and/O crew/O ,/O only/O about/O 20/O people/O have/O survived/O ./O
+		The/O Itek/B-ORG Air/O Boeing/B-ORG 737/O took/O off/O bound/O for/O Mashhad/B-PER ,/O in/O north-eastern/O Iran/B-LOC ,/O but/O turned/O round/O some/O 10/O minutes/O later/O ./O
+		
 ![`stanford-nlp-ner` container status](images/stanford_nlp_ner_status.png)
 
 #### 1.6.4 Test if the `IMDB` pipeline `imdb_pipeline` is up and running:

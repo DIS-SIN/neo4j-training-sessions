@@ -14,13 +14,21 @@ from tag_chunker import TagChunker
 
 BaseRequest.MEMFILE_MAX = 102400 * 1000
 
-# Use 172.17.0.1 if runs inside Docker container
+# Use 172.17.0.1 if runs inside Docker container for Linux or Mac OS X
+# For Windows, use ipconfig to detect the local ip and use that one
 # Use localhost if runs outside of Docker
+
 SCRAPPER_URI = 'http://172.17.0.1:8000/scrappe'
 STANFORD_POS_HOST = '172.17.0.1'
 STANFORD_POS_PORT = 8001
 STANFORD_NER_HOST = '172.17.0.1'
 STANFORD_NER_PORT = 8002
+
+NEO4J_CONF = {
+    'neo4j_bolt_server': 'bolt://172.17.0.1',
+    'neo4j_user': 'neo4j',
+    'neo4j_password': '##dis@da2019##',
+}
 
 pos_adapter = SocketAdapter({
     'host': STANFORD_POS_HOST,
@@ -55,12 +63,6 @@ ner_chunker = TagChunker(
     },
     lambda x: ' '.join(i[:i.rfind('/')] for i in x)
 )
-
-NEO4J_CONF = {
-    'neo4j_bolt_server': 'bolt://172.17.0.1',
-    'neo4j_user': 'neo4j',
-    'neo4j_password': '##dis@da2019##',
-}
 
 neo4j_adapter = Neo4jAdapter(NEO4J_CONF)
 
