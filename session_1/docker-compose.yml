@@ -29,4 +29,3 @@ services:
     image: pipeline-0.1:imdb
     ports: 
       - 8003:8003 
- 

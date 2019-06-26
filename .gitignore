@@ -9,6 +9,12 @@ __pycache__/
 # Mac OS X
 .DS_Store
 
+# Stanford Jars
+stanford_jars/
+
+# NLTK_DATA
+nltk_data/
+
 # Distribution / packaging
 .Python
 build/

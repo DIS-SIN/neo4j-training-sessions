@@ -21,6 +21,7 @@ class SocketAdapter(object):
 
         try:
             data = sock.recv(self.buffer_size)
+            print(data)
         except socket.timeout:
             sock.close()
             # elapsed_time = int(round(time.time() * 1000)) - start_time

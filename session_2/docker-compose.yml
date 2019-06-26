@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  stanford-nlp-pos:
+    build:
+      context: .
+      dockerfile: stanford_nlp/pos/Dockerfile
+    image: stanford-nlp-3.9.2:pos
+    ports: 
+      - 8001:8001 
+
+  nltk-nlp:
+    build:
+      context: .
+      dockerfile: nltk/Dockerfile
+    image: nltk-3.4.3:full-english
+    ports: 
+      - 8004:6543
+
+  # stanford-corenlp:
+  #   build:
+  #     context: .
+  #     dockerfile: stanford_nlp/corenlp/Dockerfile
+  #   image: stanford-corenlp-3.9.2:full-english
+  #   ports: 
+  #     - 9000:80
