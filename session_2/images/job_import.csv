@@ -1,2 +1,0 @@
-﻿batches,total,timeTaken,committedOperations,failedOperations,failedBatches,retries,errorMessages,batch,operations,wasTerminated,failedParams
-1093,1092096,38,1092096,0,0,0,{},"{total:1093,committed:1093,failed:0,errors:{}}","{total:1092096,committed:1092096,failed:0,errors:{}}",false,{}

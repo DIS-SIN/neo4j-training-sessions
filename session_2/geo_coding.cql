@@ -12,6 +12,11 @@
 ////////////////////////////////////////////////////////////////////////
 //
 // Geocoding all cities
+// Note: This TAKES TIME, since geocoding requests to OSM servers are
+// scheduled once every 5 seconds (to avoid flooding the servers)
+// in the neo4j-algo-apoc docker:
+// - NEO4J_apoc_spatial_geocode_provider=osm
+// - NEO4J_apoc_spatial_geocode_osm_throttle=5000
 //
 CALL apoc.periodic.iterate(
 "

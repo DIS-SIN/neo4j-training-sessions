@@ -586,7 +586,7 @@ CALL apoc.periodic.iterate(
 "
     MATCH (jt:JobTitle) 
     WITH jt 
-        WHERE EXISTS(jt.kp_list)
+        WHERE EXISTS(jt.kp_list) AND SIZE(jt.lst_code) > 0
     RETURN jt    
 ","
     WITH jt, apoc.convert.fromJsonList(jt.kp_list) AS kp_list
@@ -646,7 +646,7 @@ CALL apoc.periodic.iterate(
 "
     MATCH (j:Job) 
     WITH j 
-        WHERE EXISTS(j.kp_list) AND SIZE(j.kp_list) > 0
+        WHERE EXISTS(j.kp_list) AND SIZE(j.kp_list) > 0 AND SIZE(jt.lst_code) > 0
     RETURN j
 ","
     WITH j, apoc.convert.fromJsonList(j.kp_list) AS kp_list
@@ -716,13 +716,15 @@ CALL apoc.periodic.iterate(
     WITH u, jt_kp_ls_list
         UNWIND jt_kp_ls_list AS ij_kp_ls_list
     WITH u, ij_kp_ls_list[0] AS idx, apoc.convert.fromJsonList(ij_kp_ls_list[1][0]) AS kp_list, ij_kp_ls_list[1][1] AS lst_code
-        MERGE (lst:LSTitle {code: lst_code})
-            MERGE (u)-[:U_LST {i: idx}]->(lst)
-        FOREACH (w IN kp_list |
-            MERGE (lsw:LSWord {c: w})
-                ON CREATE SET lsw.f = 1
-                ON MATCH SET lsw.f = lsw.f + 1
-            MERGE (lst)-[:HAS_LSW]->(lsw)
+        FOREACH (dummy IN CASE WHEN SIZE(lst_code) > 0 THEN [1] ELSE [] END |
+            MERGE (lst:LSTitle {code: lst_code})
+                MERGE (u)-[:U_LST {i: idx}]->(lst)
+            FOREACH (w IN kp_list |
+                MERGE (lsw:LSWord {c: w})
+                    ON CREATE SET lsw.f = 1
+                    ON MATCH SET lsw.f = lsw.f + 1
+                MERGE (lst)-[:HAS_LSW]->(lsw)
+            )
         )
     RETURN COUNT(u)
 ",
@@ -751,8 +753,9 @@ CALL apoc.periodic.iterate(
 ","
     WITH user, u_lst
         MATCH (user)-[:APPLIED]-(job:Job)-[:A_LST]->(j_lst:LSTitle)
-    WITH u_lst, j_lst
+    WITH user, u_lst, j_lst
         MERGE (u_lst)-[r:A_NEXT]->(j_lst)
+			SET r.users = CASE WHEN r.users IS NULL THEN [user.uid] WHEN r.users IS NOT NULL AND NOT(user.uid IN r.users) THEN r.users + [user.uid] ELSE r.users END
 ",
 {
     batchSize:100, iterateList:true, parallel:false
@@ -784,8 +787,7 @@ CALL apoc.periodic.iterate(
     	UNWIND pair_list AS pair
     WITH user, pair[0] AS s, pair[1] AS d
         MERGE (s)-[r:NEXT]->(d)
-			ON CREATE SET r.users = [user.uid]
-			ON MATCH SET r.users = CASE WHEN NOT(user.uid IN r.users) THEN r.users + [user.uid] ELSE r.users END
+			SET r.users = CASE WHEN r.users IS NULL THEN [user.uid] WHEN r.users IS NOT NULL AND NOT(user.uid IN r.users) THEN r.users + [user.uid] ELSE r.users END
 ",
 {
     batchSize:100, iterateList:true, parallel:false

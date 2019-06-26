@@ -61,6 +61,37 @@
 - what actors, directors participated in most of the film production?
 - what actors could have worked with same directors many times (strong influence)
 
-
 #### For more information:
 - [Hands-on](/session_1/README.md)
+
+--- 
+
+## Session 2: *Next* job recommendations
+
+### Business case
+- Objective: recommending `natural next jobs` from 1M+ job ads.
+- Approach:
+    + Suggesting jobs based on `collaborative-based filtering` - top most common transitions from a job
+    + Using a standard occupation classification system with `tree-like` structure and `clusters` of verified job titles serving as anchor points for matching users' and job ads' job titles. Matching job titles based on `content-based filtering` using Natural Language Processing with ML models for sentence tagging to extract `key phrases` from job title such as `software developer`, `project manager`, ...
+    + Improve recommendation quality by using geographical information of user's and job ads' locations
+
+### Technology aspects
+- Datasets/APIs/toolkits: 
+    + `Kaggle Job Recommendation Challenge` contributed by `CareerBuilder`.
+    + Standard Occupaction Classifications (SOC) 2010 from US Bureau of Labour and Statistics (BLS) and O*NET organization for occupations, job titles, tech skills, tools used.
+    + Stanford Core Natural Language Processing - `Staford CoreLNP` version `3.9.2` for Part-of-Speech tagging job titles, turning them into `key phrases`.
+    + Natural Language Toolkit - `NLTK` version `3.4.3` for lemmatization and stemming of English words.
+    + OpenStreetMap - `OSM` server for geocoding location's coordinates.
+- Technology framework:
+    + Neo4j graph database
+    + Docker containers as Micro Services: 
+        * Neo4j `CE` version `3.5.5`, exposing via both `HTTP` (7474) and `Bolt` (7687) interfaces
+        * Stanford `3.9.2` POS Tagger, exposing via socket (8001)
+        * NLTK-wrapped around by Python `bottle` web framework and `waitress` WSGI server
+    + Neo4j browser for query executions
+
+#### For more information:
+- [Presentation](https://www.beautiful.ai/-LiJfyF_eU5Zcopdg9Mp/1)
+
+#### For more information:
+- [Hands-on](/session_2/README.md)
