@@ -82,6 +82,10 @@ if [[ $commands == *"i"* ]]; then
     (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_import.cql
     printf "Done.\n"
 
+    printf "Import OSM geocoded data ...\n"
+    (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < import_osm_codes.cql
+    printf "Done.\n"
+
     ./graph_db_report.sh
 fi
 

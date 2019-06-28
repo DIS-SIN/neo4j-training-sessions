@@ -115,7 +115,7 @@ WITH code, title, short_title, norm_title
 		MERGE (jt)-[:IN_OOC]->(ooc)
 	)
 	FOREACH (dummy IN CASE WHEN short_title <> 'n/a' THEN [1] ELSE [] END |
-		MERGE (jt:JobTitle {code: code + ':' + title})    
+		MERGE (jt:JobTitle {code: title})    
 			ON CREATE SET jt.name = norm_title, jt.abbr = short_title
 		MERGE (jt)-[:IN_OOC]->(ooc)
 	)

@@ -99,6 +99,13 @@
     + print a `snapshot report` (no separate command for this) of nodes and relationships inside the graph database.
     + create a `backup copy` named `session_2_gdb.tar.gz` in the parent directory of `neo4j-training-sessions`
 
+- In this session:
+
+    + Download a copy of the graph database from [Session 2 Graph Database](https://drive.google.com/drive/folders/1cXRNOPT1XKjTH4SbqkCKbLCPPA1ozXtW?usp=sharing)
+    + Save it in the parent directory of `neo4j-training-sessions`
+    + Restore the graph database for  `neo4j-algo-apoc` (don't user `p` option if the neo4j password has been set)
+        
+        ./data_tasks.sh pr
 
 ### 5. Test recommmendation queries
 
@@ -165,3 +172,95 @@ Note: turn off `Connect result nodes` on left side panel of the neo4j browser.
         RETURN user, r, u_lst, r1, bj1_lst, r2, bj2_lst, r3, nj_lst, r4, j_lst, r5, jt
 
 ![User -> Best match Classified title -> Best match Real-life title -> Transition to (NEXT) -> Best match Classified title](images/rec-bm_bm_next_bm.png)
+
+- Merge all above queries, aggreating, ranking based on number of paths and adding geocodes
+
+        MATCH (user:User {uid: 98})
+            WHERE EXISTS(user.history) AND SIZE(user.history) > 0
+        WITH user
+            MATCH (user)-[:IN_CITY]->(city:City)
+        WITH user, city
+            MATCH (user)-[r:U_LST {i: SIZE(user.history)-1}]->(u_lst:LSTitle)
+        WITH user, city, u_lst    
+            OPTIONAL MATCH (u_lst)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, apoc.map.fromPairs(COLLECT([jt.code, jc])) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[r:NEXT]->(:LSTitle)-[:BEST_MATCH]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]->(:LSTitle:JT)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]-(:LSTitle)-[:BEST_MATCH]-(:LSTitle)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]-(:LSTitle)-[:BEST_MATCH]-(:LSTitle)-[r:NEXT]->(:LSTitle)-[:BEST_MATCH]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+        WITH user, city, u_lst, apoc.map.sortedProperties(jc_map) AS jt_list
+        WITH user, city, u_lst, jt_list
+            UNWIND jt_list AS jc
+        WITH user, city, u_lst, jc[0] AS jt_code, jc[1] AS c ORDER BY c DESC LIMIT 10
+        WITH user, city, u_lst, jt_code, c AS rank
+            MATCH (jt:JobTitle {code: jt_code})-[:J_LST]->(j_lst:LSTitle)<-[:A_LST|BEST_MATCH*1..2]-(job:Job)-[:IN_CITY]->(job_location:City)
+                WHERE EXISTS(job_location.latitude)
+        WITH DISTINCT(job) AS job, user, city, u_lst, SUM(rank) AS rank, job_location, DISTANCE(POINT(city), POINT(job_location))/1000 AS distance_in_km
+        WITH rank, job, distance_in_km
+            WHERE distance_in_km < 20.0
+        RETURN rank, job.uid, job.title, job.city, job.state, job.country, distance_in_km ORDER BY distance_in_km LIMIT 10
+
+![Result for user 98](images/user-98-rec.png)
+
+        MATCH (user:User {uid: 47})
+            WHERE EXISTS(user.history) AND SIZE(user.history) > 0
+        WITH user
+            MATCH (user)-[:IN_CITY]->(city:City)
+        WITH user, city
+            MATCH (user)-[r:U_LST {i: SIZE(user.history)-1}]->(u_lst:LSTitle)
+        WITH user, city, u_lst    
+            OPTIONAL MATCH (u_lst)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, apoc.map.fromPairs(COLLECT([jt.code, jc])) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[r:NEXT]->(:LSTitle)-[:BEST_MATCH]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]->(:LSTitle:JT)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]-(:LSTitle)-[:BEST_MATCH]-(:LSTitle)-[r:NEXT]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+            OPTIONAL MATCH (u_lst)-[:BEST_MATCH]-(:LSTitle)-[:BEST_MATCH]-(:LSTitle)-[r:NEXT]->(:LSTitle)-[:BEST_MATCH]->(:LSTitle:JT)<-[:J_LST]-(jt:JobTitle)
+        WITH DISTINCT(jt) AS jt, user, city, u_lst, jc_map, SUM(SIZE(r.users)) AS jc
+        WITH user, city, u_lst, jc_map, COLLECT([jt.code, jc]) AS jt_list
+        WITH user, city, u_lst, REDUCE(m=jc_map, e IN jt_list | CASE WHEN apoc.map.get(m, e[0], -1) = -1 THEN apoc.map.setKey(m, e[0], e[1]) ELSE apoc.map.setKey(m, e[0], apoc.map.get(m, e[0], -1) + e[1])   END) AS jc_map
+        WITH user, city, u_lst, jc_map
+        WITH user, city, u_lst, apoc.map.sortedProperties(jc_map) AS jt_list
+        WITH user, city, u_lst, jt_list
+            UNWIND jt_list AS jc
+        WITH user, city, u_lst, jc[0] AS jt_code, jc[1] AS c ORDER BY c DESC LIMIT 10
+        WITH user, city, u_lst, jt_code, c AS rank
+            MATCH (jt:JobTitle {code: jt_code})-[:J_LST]->(j_lst:LSTitle)<-[:A_LST|BEST_MATCH*1..2]-(job:Job)-[:IN_CITY]->(job_location:City)
+                WHERE EXISTS(job_location.latitude)
+        WITH DISTINCT(job) AS job, user, city, u_lst, SUM(rank) AS rank, job_location, DISTANCE(POINT(city), POINT(job_location))/1000 AS distance_in_km
+        WITH rank, job, distance_in_km
+            WHERE distance_in_km < 20.0
+        RETURN rank, job.uid, job.title, job.city, job.state, job.country, distance_in_km ORDER BY distance_in_km LIMIT 10
+
+![Result for user 47](images/user-47-rec.png)

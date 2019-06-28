@@ -6,7 +6,7 @@ ENV STANFORD_NLP_RELEASE='2018-10-05' \
 
 RUN mkdir /stanford
 
-COPY ~/stanford_jars/*.jar /stanford/
+COPY stanford_jars/* /stanford/
 
 ENV CLASSPATH='joda-time.jar:jollyday.jar:protobuf.jar:stanford-corenlp-'${STANFORD_NLP_VERSION}'.jar:stanford-corenlp-'${STANFORD_NLP_VERSION}'-models.jar:stanford-english-corenlp-'${STANFORD_NLP_RELEASE}'-models.jar:stanford-english-kbp-corenlp-'${STANFORD_NLP_RELEASE}'-models.jar:xom.jar:*'
 
