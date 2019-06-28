@@ -17,10 +17,10 @@ services:
     ports: 
       - 8004:6543
 
-  stanford-corenlp:
-    build:
-      context: .
-      dockerfile: stanford_nlp/corenlp/Dockerfile
-    image: stanford-corenlp-3.9.2:full-english
-    ports: 
-      - 9000:80
+  # stanford-corenlp:
+  #   build:
+  #     context: .
+  #     dockerfile: stanford_nlp/corenlp/Dockerfile
+  #   image: stanford-corenlp-3.9.2:full-english
+  #   ports: 
+  #     - 9000:80
