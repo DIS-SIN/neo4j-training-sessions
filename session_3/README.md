@@ -163,7 +163,8 @@ Probably the following graph will be displayed in the neo4j browser. Feel free t
         );
 
 8. Cleaning the neo4j instance:
-		docker-compose down
+
+        docker-compose down
         sudo rm -rf ../neo4j-algo-apoc/data/databases
         sudo rm -rf ../neo4j-algo-apoc/data/dbms
 
