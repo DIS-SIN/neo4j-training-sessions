@@ -6,7 +6,7 @@
 
 ### Objectives:
 - Seeing the big picture
-- Best practices 
+- Best practices
 - Secret sauces
 
 ### Style:
@@ -25,12 +25,12 @@
 - A few online slides
 - Most are reproducible dockers, github repos, etc.
 
---- 
+---
 
 ## Session 1: *"I thought Christmas only comes once a year."*
 
 ### Business Perspectives (20 mins) - Neo4j overview
-- An example of `Rumor spreading: JOIN-ing infinite number of SQL tables` is discussed to showcase needs for handling graph data is discussed. What traditional do SQL databases offer for these cases, and how can it be solved with `Neo4j`. 
+- An example of `Rumor spreading: JOIN-ing infinite number of SQL tables` is discussed to showcase needs for handling graph data is discussed. What traditional do SQL databases offer for these cases, and how can it be solved with `Neo4j`.
 - Three business cases of why, how, and with what results organizations such as `US Army`, `Mosanto`, and `International Consortium of Investigative Journalists (ICIJ)` tranform some of their data, processes, and applications to `Neo4j`.
 - A brief discussion of what the `Neo4j` ecosystem consists of, how to get more information, and how to actively start using for your business cases.
 
@@ -45,7 +45,7 @@
 - [Presentation](https://www.beautiful.ai/player/-LhIka_3VR69748r-tqQ)
 
 ### Hands-on Lab (30 mins) - `the devil is in details`
-1. Get the dataset: 
+1. Get the dataset:
 - harvesting data (movie, directors, actors, rarting, votes, ...) from `imdb.com` with `scrapper-0.1:imdb` as a micro service
 - reusing existing data from `Wikipedia` from a tab-separated file
 
@@ -53,7 +53,7 @@
 - `stanford-nlp-3.9.2:pos`: Stanford NLP Part-of-Speech tagger docker (as micro service)
 - `stanford-nlp-3.9.2:ner`: Stanford NLP Named Entity tagger docker (as micro service)
 - store the entities and their relationships in a storage called `neo4j-3.5.5:algo-apoc`, which is a neo4j docker with APOC and ALGO libraries.
-    
+
 3. Visualization and queries with Neo4j browser, and answering a few questions
 - how the meta graph look like?
 - what are the representing features of some movies?
@@ -64,7 +64,7 @@
 #### For more information:
 - [Hands-on](/session_1/README.md)
 
---- 
+---
 
 ## Session 2: *Next* job recommendations
 
@@ -76,7 +76,7 @@
     + Improve recommendation quality by using geographical information of user's and job ads' locations
 
 ### Technology aspects
-- Datasets/APIs/toolkits: 
+- Datasets/APIs/toolkits:
     + `Kaggle Job Recommendation Challenge` contributed by `CareerBuilder`.
     + Standard Occupaction Classifications (SOC) 2010 from US Bureau of Labour and Statistics (BLS) and O*NET organization for occupations, job titles, tech skills, tools used.
     + Stanford Core Natural Language Processing - `Staford CoreLNP` version `3.9.2` for Part-of-Speech tagging job titles, turning them into `key phrases`.
@@ -84,7 +84,7 @@
     + OpenStreetMap - `OSM` server for geocoding location's coordinates.
 - Technology framework:
     + Neo4j graph database
-    + Docker containers as Micro Services: 
+    + Docker containers as Micro Services:
         * Neo4j `CE` version `3.5.5`, exposing via both `HTTP` (7474) and `Bolt` (7687) interfaces
         * Stanford `3.9.2` POS Tagger, exposing via socket (8001)
         * NLTK-wrapped around by Python `bottle` web framework and `waitress` WSGI server
@@ -95,3 +95,24 @@
 
 #### For more information:
 - [Hands-on](/session_2/README.md)
+
+---
+
+## Session 3: Large data import and simple analysis of survey data
+
+### Business case
+- Objective: provide simple statistics for school survey response rate
+- Approach:
+    + Importing current dataset of registrations and survey reponses
+    + Providing simple statistics
+
+### Technology aspects
+- Using `neo4j-admin` special `import` feature for large data import at high performance.
+- Preparing data - normalize, entities, relationships, headers, etc for import
+- Using `apoc.csv.export.query` to export data in `csv` format.
+
+#### For more information:
+- [Presentation]()
+
+#### For more information:
+- [Hands-on](/session_3/README.md)
