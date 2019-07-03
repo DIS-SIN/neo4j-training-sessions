@@ -42,7 +42,7 @@
 - How can this graph database can be enriched and what purposes it might serve?
 
 #### For more information:
-- [Presentation](https://www.beautiful.ai/player/-LhIka_3VR69748r-tqQ)
+- [Presentation](https://www.beautiful.ai/player/-LipKl2Hemgu7Pd7XGC0)
 
 ### Hands-on Lab (30 mins) - `the devil is in details`
 1. Get the dataset:
@@ -91,7 +91,7 @@
     + Neo4j browser for query executions
 
 #### For more information:
-- [Presentation](https://www.beautiful.ai/-LiJfyF_eU5Zcopdg9Mp/1)
+- [Presentation](https://www.beautiful.ai/player/-LipKeK17bpKUNWAvUpb)
 
 #### For more information:
 - [Hands-on](/session_2/README.md)
@@ -112,7 +112,7 @@
 - Using `apoc.csv.export.query` to export data in `csv` format.
 
 #### For more information:
-- [Presentation]()
+- [Presentation](https://www.beautiful.ai/player/-LipKZjJUAFuawWsdyOQ)
 
 #### For more information:
 - [Hands-on](/session_3/README.md)

@@ -15,6 +15,11 @@ stanford_jars/
 # NLTK_DATA
 nltk_data/
 
+# Kafka plugins and tester
+plugins
+*.neo4j.json
+*-tester-1.0.jar
+
 # Distribution / packaging
 .Python
 build/
