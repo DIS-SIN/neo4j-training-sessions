@@ -75,6 +75,11 @@ services:
       - NEO4J_kafka_zookeeper_connect=zookeeper:2181
       - NEO4J_kafka_bootstrap_servers=broker:9093
 
+  neo4j-mon:
+    image: mdavidallen/halin:latest
+    ports:
+      - 3000:3000
+
   zookeeper:
     image: confluentinc/cp-zookeeper
     ports:
