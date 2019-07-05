@@ -1,49 +1,22 @@
----
+#
+# https://github.com/neo4j-contrib/neo4j-streams/blob/3.5/kafka-connect-neo4j/docker/docker-compose.yml
+#
 version: '3'
 
 services:
 
-  neo4j-dwh:
-    build:
-      context: ./neo4j-dwh
-      dockerfile: Dockerfile
-    image: neo4j-3.5.6-eaapos:dwh
-    depends_on:
-      - zookeeper
-      - broker
-    ports:
-      - 7575:7474
-      - 7676:7687
-    volumes:
-      - ${NEO4J_DWH_DATA}:/var/lib/neo4j/data
-      - ${NEO4J_DWH_IMPT}:/var/lib/neo4j/import
-      - ${NEO4J_DWH_LOGS}:/logs
-    environment:
-      - NEO4J_AUTH=neo4j/##dis@da2019##
-      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
-      - NEO4J_dbms_memory_heap_initial__size=4G
-      - NEO4J_dbms_memory_heap_max__size=4G
-      - NEO4J_dbms_memory_pagecache_size=2G
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
-      - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
-      - NEO4J_apoc_import_file_enabled=true
-      - NEO4J_apoc_import_file_use__neo4j__config=true
-      - NEO4J_apoc_export_file_enabled=true
-      - NEO4J_apoc_http_timeout_connect=60000
-      - NEO4J_apoc_http_timeout_read=120000
-      - NEO4J_apoc_jobs_pool_num__threads=4
-      - NEO4J_apoc_jobs_schedule_num__threads=4
-      - NEO4J_apoc_spatial_geocode_provider=osm
-      - NEO4J_apoc_spatial_geocode_osm_throttle=5000
-      - NEO4j_streams_procedures_enable=true
-      - NEO4J_kafka_zookeeper_connect=zookeeper:2181
-      - NEO4J_kafka_bootstrap_servers=broker:9093
+################################################################################
+# neo4j
+# https://neo4j.com/developer/docker-run-neo4j/
+################################################################################
 
-  neo4j-gdb:
+  neo4j:
     build:
-      context: ./neo4j-gdb
+      context: ./neo4j
       dockerfile: Dockerfile
-    image: neo4j-3.5.6-eaapos:gdb
+    image: neo4j-3.5.6-enterprise:aakop-gdb
+    hostname: neo4j
+    container_name: neo4j
     depends_on:
       - zookeeper
       - broker
@@ -57,9 +30,9 @@ services:
     environment:
       - NEO4J_AUTH=neo4j/##dis@da2019##
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
-      - NEO4J_dbms_memory_heap_initial__size=4G
-      - NEO4J_dbms_memory_heap_max__size=4G
-      - NEO4J_dbms_memory_pagecache_size=2G
+      - NEO4J_dbms_memory_heap_initial__size=2G
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
       - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
       - NEO4J_apoc_import_file_enabled=true
@@ -71,25 +44,48 @@ services:
       - NEO4J_apoc_jobs_schedule_num__threads=4
       - NEO4J_apoc_spatial_geocode_provider=osm
       - NEO4J_apoc_spatial_geocode_osm_throttle=5000
-      - NEO4j_streams_procedures_enable=true
+      - NEO4J_streams_procedures_enable=true
+      - NEO4J_streams_source_enabled=true
       - NEO4J_kafka_zookeeper_connect=zookeeper:2181
       - NEO4J_kafka_bootstrap_servers=broker:9093
+      - NEO4J_streams_sink_enabled=true
 
-  neo4j-mon:
+################################################################################
+# halin
+# https://github.com/moxious/halin
+################################################################################
+
+  halin:
     image: mdavidallen/halin:latest
+    hostname: halin
+    container_name: halin
     ports:
       - 3000:3000
 
+################################################################################
+# zookeeper
+# https://docs.confluent.io/current/zookeeper/deployment.html
+################################################################################
+
   zookeeper:
     image: confluentinc/cp-zookeeper
+    hostname: zookeeper
+    container_name: zookeeper
     ports:
       - "2181:2181"
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
 
+################################################################################
+# kafka broker
+# https://docs.confluent.io/current/installation/configuration/broker-configs.html
+################################################################################
+
   broker:
     image: confluentinc/cp-enterprise-kafka
+    hostname: broker
+    container_name: broker
     depends_on:
       - zookeeper
     ports:
@@ -114,6 +110,8 @@ services:
 
   schema_registry:
     image: confluentinc/cp-schema-registry
+    hostname: schema_registry
+    container_name: schema_registry
     depends_on:
       - zookeeper
       - broker
@@ -123,8 +121,15 @@ services:
       - SCHEMA_REGISTRY_HOST_NAME=schema_registry
       - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181
 
+################################################################################
+# kafka connect
+# https://docs.confluent.io/current/connect/index.html
+################################################################################
+
   connect:
     image: confluentinc/cp-kafka-connect
+    hostname: connect
+    container_name: connect
     depends_on:
       - zookeeper
       - broker
@@ -154,9 +159,22 @@ services:
       - CONNECT_ZOOKEEPER_CONNECT=zookeeper:2181
       - CONNECT_PLUGIN_PATH=/usr/share/java,/tmp/connect-plugins,/usr/share/confluent-hub-components
       - CONNECT_LOG4J_LOGGERS=org.apache.zookeeper=DEBUG,org.I0Itec.zkclient=DEBUG,org.reflections=ERROR
+    command:
+      - bash
+      - -c
+      - |
+        confluent-hub install --no-prompt neo4j/kafka-connect-neo4j:1.0.0
+        /etc/confluent/docker/run
+
+################################################################################
+# control-center
+# https://docs.confluent.io/current/control-center/index.html
+################################################################################
 
   control-center:
     image: confluentinc/cp-enterprise-control-center
+    hostname: control-center
+    container_name: control-center
     depends_on:
       - zookeeper
       - broker
@@ -173,3 +191,46 @@ services:
       - CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS=1
       - CONFLUENT_METRICS_TOPIC_REPLICATION=1
       - PORT=9021
+
+################################################################################
+# dwh
+# data warehouse similator (producers)
+################################################################################
+
+  dwh:
+    build:
+      context: ./dwh
+      dockerfile: Dockerfile
+    image: neo4j-3.5.6-enterprise:aakop-dwh
+    hostname: dwh
+    container_name: dwh
+    depends_on:
+      - zookeeper
+      - broker
+    ports:
+      - 7575:7474
+      - 7676:7687
+    volumes:
+      - ${NEO4J_DWH_DATA}:/var/lib/neo4j/data
+      - ${NEO4J_DWH_IMPT}:/var/lib/neo4j/import
+      - ${NEO4J_DWH_LOGS}:/logs
+    environment:
+      - NEO4J_AUTH=neo4j/##dis@da2019##
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_dbms_memory_heap_initial__size=2G
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
+      - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_http_timeout_connect=60000
+      - NEO4J_apoc_http_timeout_read=120000
+      - NEO4J_apoc_jobs_pool_num__threads=4
+      - NEO4J_apoc_jobs_schedule_num__threads=4
+      - NEO4J_apoc_spatial_geocode_provider=osm
+      - NEO4J_apoc_spatial_geocode_osm_throttle=5000
+      - NEO4J_streams_procedures_enable=true
+      - NEO4J_kafka_zookeeper_connect=zookeeper:2181
+      - NEO4J_kafka_bootstrap_servers=broker:9093

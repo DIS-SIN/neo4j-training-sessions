@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export NEO4J_DWH=$PWD/neo4j-dwh
+export NEO4J_DWH=$PWD/dwh
 echo $NEO4J_DWH
 
 export NEO4J_DWH_CONF=$NEO4J_DWH/conf
@@ -13,7 +13,7 @@ echo NEO4J_DWH_DATA=$NEO4J_DWH_DATA
 echo NEO4J_DWH_LOGS=$NEO4J_DWH_LOGS
 echo NEO4J_DWH_IMPT=$NEO4J_DWH_IMPT
 
-export NEO4J_GDB=$PWD/neo4j-gdb
+export NEO4J_GDB=$PWD/neo4j
 echo $NEO4J_GDB
 
 export NEO4J_GDB_CONF=$NEO4J_GDB/conf
