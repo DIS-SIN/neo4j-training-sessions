@@ -57,7 +57,7 @@
 
   ![Dockers' status](images/dockers_status.png)
 
-5. Rename `contrib.sink.avro.neo4j.json.txt`
+5. Rename `contrib.sink.avro.neo4j.json.template`
 
         cp contrib.sink.avro.neo4j.json.template contrib.sink.avro.neo4j.json
 
