@@ -193,6 +193,28 @@ services:
       - PORT=9021
 
 ################################################################################
+# rest-proxy
+# https://docs.confluent.io/current/control-center/index.html
+################################################################################
+
+  kafka_rest:
+    image: confluentinc/cp-kafka-rest
+    hostname: kafka_rest
+    container_name: kafka_rest
+    depends_on:
+      - zookeeper
+      - broker
+      - schema_registry
+      - connect
+    ports:
+      - "8082:8082"
+    environment:
+      - KAFKA_REST_HOST_NAME=kafka_rest
+      - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_REST_LISTENERS=http://0.0.0.0:8082
+      - KAFKA_REST_SCHEMA_REGISTRY_URL=http://schema_registry:8081
+
+################################################################################
 # dwh
 # data warehouse similator (producers)
 ################################################################################

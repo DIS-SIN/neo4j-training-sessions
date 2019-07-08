@@ -51,9 +51,15 @@
         docker image rm -f $(docker image ls -aq)
         docker system prune
 
+  Dockers' status
+
+        docker stats
+
+  ![Dockers' status](images/dockers_status.png)
+
 5. Rename `contrib.sink.avro.neo4j.json.txt`
 
-        mv contrib.sink.avro.neo4j.json.template contrib.sink.avro.neo4j.json
+        cp contrib.sink.avro.neo4j.json.template contrib.sink.avro.neo4j.json
 
 6. Configure the `Neo4jSinkConnector` with `connect`:
 
@@ -116,7 +122,7 @@
 
   ![Create constraint and index](images/test_graph.png)
 
-### 2. Python client tests
+### 2. Python clients
 
 1. Install `confluent_kafka` and Apache `avro` python packages.
 
@@ -131,22 +137,22 @@
     - Simple integration with dynamic languages. Code generation is not required to read or write data files nor to use or implement RPC protocols. Code generation as an optional optimization, only worth implementing for statically typed languages.
 
 
-2. In a terminal, run command-line `test_kafka_consumer.sh` for consumer.
+2. In a terminal, run command-line `test_python_consumer.sh` for consumer.
 
-        ./test_kafka_consumer.sh my-topic
+        ./test_python_consumer.sh my-topic
 
       This will wait for new messages.
 
-3. In another terminal, run command-line `test_kafka_producer.sh` for producer:
+3. In another terminal, run command-line `test_python_producer.sh` for producer:
 
-        ./test_kafka_producer.sh my-topic Sinan Baltacioglu
+        ./test_python_producer.sh my-topic Sinan Baltacioglu
 
-        (3.7.3) nghias-mbp:session_4 nghia$ ./test_kafka_producer.sh my-topic Sinan Baltacioglu
-        (3.7.3) nghias-mbp:session_4 nghia$ ./test_kafka_producer.sh my-topic Meghan Baltacioglu
+        (3.7.3) nghias-mbp:session_4 nghia$ ./test_python_producer.sh my-topic Sinan Baltacioglu
+        (3.7.3) nghias-mbp:session_4 nghia$ ./test_python_producer.sh my-topic Meghan Baltacioglu
 
       The terminal where `test_kafka_consumer.sh` should display below content:
 
-        (3.7.3) nghias-mbp:session_4 nghia$ ./test_kafka_consumer.sh my-topic
+        (3.7.3) nghias-mbp:session_4 nghia$ ./test_python_producer.sh my-topic
         Press Ctrl+C when you want to stop the consumer.
         {'name': 'Sinan', 'surname': 'Baltacioglu'}
         {'name': 'Meghan', 'surname': 'Baltacioglu'}
@@ -156,4 +162,100 @@
 
       ![Testing adding entities and relationships](images/test_python_client.png)  
 
-### 3. Node.js® client tests
+### 2. Kafka standard command-line clients with AVRO formated messages
+
+1. In a terminal, run command-line `test_kafka_consumer.sh` for consumer.
+
+        ./test_kafka_consumer.sh my-topic
+
+      This will wait for new messages.
+
+2. In another terminal, run command-line `test_kafka_producer.sh` for producer:
+
+        ./test_kafka_producer.sh my-topic
+
+      (it waits for input, so type the following)
+
+          {"name": "X", "surname": "Men"}
+
+      Use Neo4j browser to show newly added entities and relationships:
+
+      ![Testing adding entities and relationships](images/test_kafka_client.png)  
+
+### 4. REST Proxy clients
+
+Kafka officially offers a number of [clients](https://docs.confluent.io/current/clients/index.html). There are several ways to connect Javascript clients to Kafka:
+
+- Using the official [REST Proxy](https://docs.confluent.io/current/kafka-rest/index.html): The Confluent REST Proxy provides a RESTful interface to a Kafka cluster, making it easy to produce and consume messages, view the state of the cluster, and perform administrative actions without gvusing the native Kafka protocol or clients. It has limitations. However it is probably the best way to connect a vast number of JS-based clients to Kafka clusters.
+
+- Using one of various existings Node.js libraries: basically most of them are built on top of `librdkafka`, which is a C/C++ library, fast, but requires recompilation/linking on the target platform. This is not recommended if you don't know how to deal with it. The other way is to use `kafka-node`, which is a pure Node.js implementation, unfortunately it does not support `Avro`.
+
+- Create an intermediate server application, that can connect other clients to Kafka. This would be a good solution, but it loses `Kafka-flavor`, meaning additional protocol and communication stacks have to be created.
+
+That's why solution based on the first alternative is advised.
+
+1. Consume messages via REST Proxy:
+
+  Create an endpoint:
+
+        curl -X POST  -H "Content-Type: application/vnd.kafka.v2+json" \
+        --data '{"name": "my_consumer_instance", "format": "avro", "auto.offset.reset": "earliest"}' \
+        http://localhost:8082/consumers/my_avro_consumer
+
+  Subscribe:
+
+        curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" \
+        --data '{"topics":["my-topic"]}' \
+        http://localhost:8082/consumers/my_avro_consumer/instances/my_consumer_instance/subscription
+
+  Consume messages:
+
+        curl -X GET -H "Accept: application/vnd.kafka.avro.v2+json" \
+        http://localhost:8082/consumers/my_avro_consumer/instances/my_consumer_instance/records
+
+        [{"topic":"my-topic","key":null,"value":{"name":"Bong","surname":"Doan"},"partition":0,"offset":0},{"topic":"my-topic","key":null,"value":{"name":"Bong","surname":"Doan"},"partition":0,"offset":1},{"topic":"my-topic","key":null,"value":{"name":"Thuc","surname":"Doan"},"partition":0,"offset":2},{"topic":"my-topic","key":null,"value":{"name":"Quan","surname":"Doan"},"partition":0,"offset":3},{"topic":"my-topic","key":null,"value":{"name":"X","surname":"Man"},"partition":0,"offset":4}]
+
+2. Producer message via REST Proxy:
+
+        curl -X POST -H "Content-Type: application/vnd.kafka.avro.v2+json" \
+        -H "Accept: application/vnd.kafka.v2+json" \
+        --data '{"value_schema": "{\"type\": \"record\", \"name\": \"User\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"surname\", \"type\": \"string\"}]}", "records": [{"value": {"name": "Viet", "surname": "Doan"}}]}' \
+        http://localhost:8082/topics/my-topic
+
+        {"offsets":[{"partition":0,"offset":5,"error_code":null,"error":null}],"key_schema_id":null,"value_schema_id":2}
+
+### 5. Produce and consume data streams *instantly & directly* via Cypher with Streams Procedures
+
+1. Login into `dwh` neo4j instance: http://localhost:7575, note that it uses Bolt service at `localhost:7676`, and type:
+
+        CALL streams.publish(
+          'neo4j-topic',
+          apoc.convert.toJson(apoc.map.fromPairs([["name", "Black"], ["surname", "Smith"]]))
+        )
+
+2. Login into `dwh` neo4j instance: http://localhost:7474, note that it uses Bolt service at `localhost:7687`, and type:
+
+        CALL streams.consume('neo4j-topic')
+          YIELD event
+        WITH apoc.convert.fromJsonMap(event.data.payload) AS map
+          MERGE (p:Person {name: map['name'], surname: map['surname']})
+            MERGE (f:Family{name: map['surname']})
+            MERGE (p)-[:BELONGS_TO]->(f)
+
+      ![Directly deliver data via Cypher](images/kafka-via-cypher.png)
+
+### 6. Monitoring Neo4j with halin
+
+1. Open browser windows, navigate to `localhost:3000`, choose `7676` as Bolt port, type the neo4j password and access to `Halin` monitoring interface of `dwh` instance.
+
+![dwh monitoring interface](images/dwh-halin.png)
+
+2. Open browser windows, navigate to `localhost:3000`, choose `7687` as Bolt port, type the neo4j password and access to `Halin` monitoring interface of `neo4j` instance. Click on `Cluster members` menuitem on the left menu.
+
+![neo4j monitoring interface](images/neo4j-halin.png)
+
+### 7. Monitoring Kafka via Control-Center:
+
+Navigate with browser to `localhost:9021`
+
+![control center interface](images/control-center.png)

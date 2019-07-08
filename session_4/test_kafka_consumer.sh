@@ -7,4 +7,6 @@ fi
 
 echo "Press Ctrl+C when you want to stop the consumer."
 
-python3 consumer.py $1
+docker exec schema_registry kafka-avro-console-consumer \
+  --bootstrap-server broker:9093 \
+  --topic $1 \
