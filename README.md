@@ -116,3 +116,24 @@
 
 #### For more information:
 - [Hands-on](/session_3/README.md)
+
+---
+
+## Session 4: Data streaming with Kafka
+
+### Business case
+- Objective: connecting various apps into the Kafka - Neo4j streaming framework, reducing connectivity  complexity, and enabling data consuming for different scenarios.
+- Approach:
+    + Integration of Kafka with Neo4j
+    + Showcasing ability using different clients (command-line, Java, Python, HTTP)
+
+### Technology aspects
+- Creating and running a complete `Kafka` cluster on a single machine.
+- Testing connectivity and data producing/consuming features for various clients.
+- Showcasing Neo4j `just-in-time data warehousing`.
+
+#### For more information:
+- [Presentation](https://www.beautiful.ai/player/-LjH9fE-NRPNuX-QZlkx)
+
+#### For more information:
+- [Hands-on](/session_4/README.md)
