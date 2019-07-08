@@ -137,3 +137,30 @@
 
 #### For more information:
 - [Hands-on](/session_4/README.md)
+
+---
+
+## Session 5: Data visualization
+
+### Business case
+- Objectives:
+
+  + Demonstrate capabilities of visualizing to gain insights by discovery.
+  + Introduction of different visualization tools and how to use them.
+
+- Approach:
+  + CSPS registration/survey dataset
+  + Browser
+
+### Technology aspects
+
+  + Tools:
+    * `GraphXR` cloud, JS scripts from browser connect to local `Neo4j` instance
+    * `Gephi` standalone app, data streaming from a `Neo4j` instance
+    * `Node.js` app with `Neovis.js`, perform `Cypher` queries to backend `Neo4j` instance.
+
+#### For more information:
+- [Presentation]()
+
+#### For more information:
+- [Hands-on](/session_5/README.md)
