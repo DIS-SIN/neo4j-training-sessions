@@ -244,6 +244,32 @@ That's why solution based on the first alternative is advised.
 
       ![Directly deliver data via Cypher](images/kafka-via-cypher.png)
 
+3. Any Kafka client that subscribes to `neo4-topic` should receives these messages as well.
+
+4. Now let's stream some data. On `dwh`, select a few courses with registrations and survey responses, and stream them to `neo4j`:
+
+        MATCH (c:Course)<-[:BUSINESS_TYPE_OF]-(business_type:BusinessType)
+          WHERE business_type.name IN ['Instructor-Led', 'Events']
+        WITH c
+          MATCH (c)-[:COURSE_OF]->(o:Offering)-[:SURVEYED_FOR]->(s:Survey)
+          WHERE o.start_date >= DATE('2019-04-03') AND o.start_date <= DATE('2019-04-05')
+        WITH DISTINCT(o) AS o, c, COLLECT(DISTINCT(s.uid)) AS survey_list
+        WITH c, o, survey_list
+          MATCH (o)-[:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'})
+        WITH DISTINCT(o.uid) AS o, c, survey_list, COLLECT(DISTINCT(r.uid)) AS registration_list
+        WITH DISTINCT(c.title) AS c, COLLECT([o, survey_list, registration_list]) AS osr
+        WITH COLLECT([c, osr]) AS courses
+          CALL streams.publish('neo4j-topic', apoc.convert.toJson(courses))
+        RETURN 1
+
+![dwh streaming](images/dwh-streaming.png)
+
+5. It arrives to `neo4j` when `stream.consume()` is invoked.
+
+        CALL streams.consume('neo4j-topic') YIELD event RETURN event
+
+![dwh streaming](images/neo4j-streaming.png)
+
 ### 6. Monitoring Neo4j with halin
 
 1. Open browser windows, navigate to `localhost:3000`, choose `7676` as Bolt port, type the neo4j password and access to `Halin` monitoring interface of `dwh` instance.
