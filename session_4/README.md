@@ -285,3 +285,9 @@ That's why solution based on the first alternative is advised.
 Navigate with browser to `localhost:9021`
 
 ![control center interface](images/control-center.png)
+
+### 8. Visualizing the graph of dockers:
+
+    ./visualize_docker_graph.sh
+
+![graph of dockers](docker-compose.png)    
