@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Neovis.js Simple Example</title>
+
+    <style type="text/css">
+      html, body {
+        font: 16pt arial;
+      }
+      #viz {
+        width: 900px;
+        height: 700px;
+        border: 1px solid lightgray;
+        font: 22pt arial;
+      }
+    </style>
+
+    <script src="https://cdn.neo4jlabs.com/neovis.js/v1.1.0/neovis.js"></script>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous">
+    </script>
+
+    <script type="text/javascript">
+      var viz;
+
+      function draw() {
+
+        var config = {
+          container_id: "viz",
+          server_url: "bolt://localhost:7687",
+          server_user: "neo4j",
+          server_password: "##dis@da2019##",
+
+          labels: {
+            "Course": {
+            	"caption": "title",
+              "size": "size"
+            },
+            "Offering": {
+            	"caption": "uid",
+            	"size": "size"
+            },
+            "Registration": {
+            	"caption": "uid",
+            	"size": 1.0
+            },
+            "Survey": {
+            	"caption": "uid",
+            	"size": 1.0
+            },
+            "Instructor": {
+            	"caption": "name",
+            	"size": "size"
+            }
+          },
+
+          relationships: {
+            "REGISTERED_FOR": {
+            	"caption": false
+            },
+            "COURSE_OF": {
+            	"caption": false
+            },
+            "SURVEYED_FOR": {
+            	"caption": false
+            }
+          },
+
+          initial_cypher: "MATCH (o:Offering) WHERE o.start_date >= DATE('2019-04-03') AND o.start_date <= DATE('2019-04-03') WITH o MATCH (c:Course)-[r1:COURSE_OF]->(o)-[r2:SURVEYED_FOR]->(s:Survey) WITH c, r1, o, r2, s MATCH (o)-[r3:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'}) RETURN c, r1, o, r2, s, r3, r;"
+        };
+
+        viz = new NeoVis.default(config);
+        viz.render();
+        console.log(viz);
+      }
+    </script>
+
+  </head>
+
+  <body onload="draw()">
+    <div id="viz"></div>
+    Cypher query: <textarea rows="4" cols=50 id="cypher"></textarea><br>
+    <input type="submit" value="Submit" id="reload">
+    <input type="submit" value="Stabilize" id="stabilize">
+  </body>
+
+  <script>
+    $("#reload").click(function() {
+      var cypher = $("#cypher").val();
+      if (cypher.length > 3) {
+        viz.renderWithCypher(cypher);
+      } else {
+        console.log("reload");
+        viz.reload();
+      }
+    });
+
+    $("#stabilize").click(function() {
+      viz.stabilize();
+    })
+  </script>
+</html>

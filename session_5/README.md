@@ -141,3 +141,23 @@ All instructors, courses, and offerings
 
 
 ### 5. Visualizing with Neovis.js
+
+`Neovis.js` is used for creating JavaScript based graph visualizations that are embedded in a web app. It uses the `JavaScript Neo4j` driver to connect to and fetch data from Neo4j and a JavaScript library for visualization called `vis.js` for rendering graph visualizations. `Neovis.js` can also leverage the results of graph algorithms like `PageRank` and `community detection` for styling the visualization by binding property values to visual components.
+
+In your browser open `index.html` file. Initialy it capture courses, registrations, and survey responses related to offerings on `2019-04-03` only, shown as below.
+
+  ![Customized](images/neovis.png)
+
+A text input allows further exploration by using Cypher. Note that the nodes and relationships returned might not be styled.
+
+    MATCH (o:Offering)
+      WHERE o.start_date >= DATE('2019-04-03') AND o.start_date <= DATE('2019-04-03')
+    WITH o
+      MATCH (c:Course)-[r1:COURSE_OF]->(o)-[r2:SURVEYED_FOR]->(s:Survey)
+    WITH c, r1, o, r2, s
+      MATCH (o)-[r3:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'})
+    WITH c, r1, o, r2, s, r3, r
+      MATCH (i:Instructor)-[r4:INSTRUCTOR_OF]->(o), (r)<-[r5:LEARNER_OF]-(l:Learner)
+    RETURN c, r1, o, r2, s, r3, r, i, r4, r5, l;
+
+  ![Customized](images/neovis-dynamic.png)
