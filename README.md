@@ -160,7 +160,7 @@
     * `Node.js` app with `Neovis.js`, perform `Cypher` queries to backend `Neo4j` instance.
 
 #### For more information:
-- [Presentation]()
+- [Presentation](https://www.beautiful.ai/player/-LjMvJyVTefrlnUmd0mE)
 
 #### For more information:
 - [Hands-on](/session_5/README.md)
