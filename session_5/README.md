@@ -140,6 +140,54 @@ All instructors, courses, and offerings
   ![Customized](images/gephi-instructor-courses.png)
 
 
+All instructors' communities
+
+- Creating `TOGETHER` relationships:
+
+      MATCH (i1:Instructor)
+      WITH i1
+        MATCH (i2:Instructor) WHERE i2 <> i1
+      WITH i1, i2
+        MATCH (i1)-[:INSTRUCTOR_OF]->(o)<-[:INSTRUCTOR_OF]-(i2)
+      WITH DISTINCT(i2) AS i2, i1, COUNT(DISTINCT(o)) AS oc
+        MERGE (i1)-[r1:TOGETHER]->(i2)
+          ON CREATE SET r1.c = oc
+        MERGE (i2)-[r2:TOGETHER]->(i1)
+          ON CREATE SET r2.c = oc;
+
+- Creating `community` with `Louvain community detection algorithm`:
+
+      CALL algo.louvain('Instructor', 'TOGETHER', {write:true, writeProperty:'community'})
+      YIELD nodes, communityCount, iterations, loadMillis, computeMillis, writeMillis;
+
+
+- What are the communities?
+
+      MATCH (i:Instructor) RETURN DISTINCT(i.community) AS i, COLLECT(i.name) AS c ORDER BY SIZE(c) DESC
+
+- Display on `Neo4j` browser:
+
+      MATCH (i:Instructor)
+        WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
+      MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
+        WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
+      RETUDN path
+
+    ![Customized](images/instructor-communities.png)
+
+- Streaming to `Gephi`:
+
+      MATCH (i:Instructor)
+        WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
+      MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
+    	  WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
+      WITH COLLECT(path) AS paths
+    	  CALL apoc.gephi.add('http://10.0.1.167:8080','workspace0', paths) yield nodes, relationships, time
+      RETURN time
+
+  ![Customized](images/gephi-instructor-communities.png)
+
+
 ### 5. Visualizing with Neovis.js
 
 `Neovis.js` is used for creating JavaScript based graph visualizations that are embedded in a web app. It uses the `JavaScript Neo4j` driver to connect to and fetch data from Neo4j and a JavaScript library for visualization called `vis.js` for rendering graph visualizations. `Neovis.js` can also leverage the results of graph algorithms like `PageRank` and `community detection` for styling the visualization by binding property values to visual components.
@@ -175,3 +223,13 @@ A text input allows further exploration by using Cypher. Note that the nodes and
     RETURN c, r1, o, r2, s, r3, r, i, r4, r5, l;
 
   ![Customized](images/neovis-dynamic.png)
+
+For dislaying communities:
+
+    MATCH (i:Instructor)
+      WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
+    MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
+      WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
+    RETUDN path
+
+  ![Customized](images/neovis-communities.png)
