@@ -148,6 +148,20 @@ In your browser open `index.html` file. Initialy it capture courses, registratio
 
   ![Customized](images/neovis.png)
 
+Preparation for displaying node properties:
+
+    MATCH (o:Offering) WITH o MATCH (o)-[r:REGISTERED_FOR|SURVEY_FOR]->()
+    WITH o, COUNT(DISTINCT(r)) AS rc
+    SET o.size = rc;
+
+    MATCH (c:Course) WITH c MATCH (c)-[r:COURSE_OF]->(:Offering)
+    WITH c, COUNT(r) AS rc
+      SET c.size = rc;
+
+    MATCH (i:Instructor) WITH i MATCH (i)-[r:INSTRUCTOR_OF]->()
+    WITH i, COUNT(DISTINCT(r)) AS rc
+      SET i.size = rc;
+
 A text input allows further exploration by using Cypher. Note that the nodes and relationships returned might not be styled.
 
     MATCH (o:Offering)

@@ -1,4 +1,4 @@
-FROM  neo4j:3.5.6-enterprise
+FROM  neo4j:3.5.6
 
 ENV ALGO_LIB_VERSION=3.5.4.0 \
     APOC_LIB_VERSION=3.5.0.4 \
