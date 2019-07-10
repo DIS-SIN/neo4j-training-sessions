@@ -11,46 +11,55 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-MATCH path=(c:Course {code: "G414"})-[:COURSE_OF]->(o:Offering)
+MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
    WHERE o.start_date = DATE('2019-04-03')
 WITH c, o, COLLECT(path) AS paths
  	MATCH path=(inst:Instructor)-[:INSTRUCTOR_OF]->(o)<-[:LANGUAGE_OF]-(lang:Language)
 WITH c, o, paths + COLLECT(path) AS paths
 	MATCH path=(o)<-[:OFFERED_IN]-(o_cit)<-[:PROVINCE_OF]-(o_pro:Province)<-[:REGION_OF]-(o_reg:Region)
-WITH paths + COLLECT(path) AS paths
-RETURN paths;
+RETURN paths + COLLECT(path) AS paths;
 //
 MATCH path=(c:Course {code: "G414"})-[:COURSE_OF]->(o:Offering)
    WHERE o.start_date = DATE('2019-04-03')
 WITH c, o, COLLECT(path) AS paths
 	MATCH path=(o)-[:REGISTERED_FOR]->(r:Registration)<-[:LEARNER_OF]-(l:Learner)<-[:LOCATED_IN]-(l_cit)<-[:PROVINCE_OF]-(l_pro:Province)<-[:REGION_OF]-(l_reg:Region)
-WITH paths + COLLECT(path) AS paths
-	CALL apoc.gephi.add('http://10.1.51.82:8080','workspace0', paths) yield nodes, relationships, time
-RETURN time;
+RETURN paths + COLLECT(path) AS paths;
 //
 MATCH path=(c:Course {code: "G414"})-[:COURSE_OF]->(o:Offering)
    WHERE o.start_date = DATE('2019-04-03')
 WITH c, o, COLLECT(path) AS paths
 	MATCH path=(o)-[:REGISTERED_FOR]->(r:Registration)<-[:LEARNER_OF]-(l:Learner)<-[:CLASSIFICATION_OF]-(:Classification)<-[:CLASSIFICATION_GROUP_OF]-(:ClassificationGroup)
-WITH paths + COLLECT(path) AS paths
-	CALL apoc.gephi.add('http://10.1.51.82:8080','workspace1', paths) yield nodes, relationships, time
-RETURN time;
+RETURN paths + COLLECT(path) AS paths;
 //
-MATCH path=(c:Course {code: "G131"})-[:COURSE_OF]->(o:Offering)
-   WHERE o.start_date = DATE('2019-04-05')
+MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
+   WHERE o.start_date = DATE('2019-04-03')
 WITH c, o, COLLECT(path) AS paths
 	MATCH path=(o)-[:SURVEYED_FOR]->(:Survey)<-[:CLASSIFICATION_OF]-(:Classification)<-[:CLASSIFICATION_GROUP_OF]-(:ClassificationGroup)
-WITH paths + COLLECT(path) AS paths
-	CALL apoc.gephi.add('http://10.1.51.82:8080','workspace2', paths) yield nodes, relationships, time
-RETURN time;
+RETURN paths + COLLECT(path) AS paths;
 //
-MATCH path=(c:Course {code: "G131"})-[:COURSE_OF]->(o:Offering)
+MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
    WHERE o.start_date = DATE('2019-04-03')
 WITH c, o, COLLECT(path) AS paths
 	MATCH path=(o)-[:SURVEYED_FOR]->(s:Survey)<-[:DEPARTMENT_OF]-(d:Department)
-WITH paths + COLLECT(path) AS paths
-	CALL apoc.gephi.add('http://10.1.51.82:8080','workspace3', paths) yield nodes, relationships, time
-RETURN time
+RETURN paths + COLLECT(path) AS paths;
+//
+MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
+   WHERE o.start_date = DATE('2019-04-03')
+WITH c, o, COLLECT(path) AS paths
+ 	MATCH path=(o)-[:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'})
+WITH c, o, paths + COLLECT(path) AS paths
+	MATCH path=(o)-[:SURVEYED_FOR]->(:Survey)
+RETURN paths + COLLECT(path) AS paths;
+//
+MATCH path=(i:Instructor)-[:INSTRUCTOR_OF|COURSE_OF*2]-(c)
+WITH DISTINCT(c) AS c, i, COUNT(*) AS w
+WITH i, c, w
+	CALL apoc.create.vRelationship(i,'TEACHES', {weight: w}, c) YIELD rel
+WITH i, COLLECT([rel, c]) AS cc
+WITH i, cc ORDER BY SIZE(cc) DESC LIMIT 20
+WITH COLLECT([i, cc]) AS paths
+	CALL apoc.gephi.add('http://10.1.51.73:8080','workspace0', paths, 'weight') yield nodes, relationships, time
+RETURN time;
 //
 ////////////////////////////////////////////////////////////////////////
 
