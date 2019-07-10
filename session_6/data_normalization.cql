@@ -139,6 +139,7 @@ MATCH (survey:Survey)
 MATCH (classification:Classification {code: "CFLieutenant - 00"})
   WITH classification, survey
     MERGE (survey)<-[:CLASSIFICATION_OF]-(classification);
+//
 MATCH (survey:Survey)
 	WHERE SIZE((survey)<-[:CLASSIFICATION_OF]-()) = 0
     AND LOWER(survey.classification) STARTS WITH 'cf'
@@ -285,7 +286,7 @@ CALL apoc.periodic.iterate(
   ] AS pairs
     UNWIND pairs AS pair
   WITH pair[0] AS survey_department, pair[1] AS department_code
-    MATCH (department {code: department_code}), (survey:Survey {department: survey_department})
+    MATCH (department:Department {code: department_code}), (survey:Survey {department: survey_department})
     	WHERE SIZE((survey)<-[:DEPARTMENT_OF]-()) = 0
   RETURN department, COLLECT(survey) AS survey_list
 ", "
