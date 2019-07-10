@@ -37,6 +37,7 @@ if [[ $commands == *"s"* ]]; then
   && cd neo4j/data \
   && sudo rm -rf databases \
   && sudo tar xzvf $BACKUP_DIRECTORY/csps_survey_gdb.tar.gz \
+  && sudo chmod -R 777 databases \
   && cd ../.. \
   && docker-compose up -d
 
@@ -59,6 +60,7 @@ if [[ $commands == *"r"* ]]; then
   && cd neo4j/data \
   && sudo rm -rf databases \
   && sudo tar xzvf $BACKUP_DIRECTORY/session_6_gdb.tar.gz \
+  && sudo chmod -R 777 databases \
   && cd ../.. \
   && docker-compose up -d
 
