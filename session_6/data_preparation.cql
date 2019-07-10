@@ -64,3 +64,25 @@ WITH COLLECT(path) AS paths
 RETURN time;
 //
 ////////////////////////////////////////////////////////////////////////
+
+MATCH (c)-[:COURSE_OF]->(o:Offering)
+   WHERE o.start_date = DATE('2019-04-03')
+WITH c, o
+ 	MATCH path=(o)<-[:LANGUAGE_OF]-(lang:Language)
+WITH c, o, COLLECT(path) AS paths
+	MATCH path=(o)<-[:INSTRUCTOR_OF]-(inst:Instructor)
+WITH c, o, paths + COLLECT(path) AS paths
+	MATCH path=(o)-[:REGISTERED_FOR]->(r:Registration)<-[:LEARNER_OF]-(l:Learner)<-[:LOCATED_IN]-(l_cit)<-[:PROVINCE_OF]-(l_pro:Province)<-[:REGION_OF]-(l_reg:Region)
+WITH c, o, l, paths + COLLECT(path) AS paths
+	MATCH path=(l)<-[:DEPARTMENT_OF]-(d:Department)
+WITH c, o, l, paths + COLLECT(path) AS paths
+	MATCH path=(l)<-[:CLASSIFICATION_OF]-(:Classification)<-[:CLASSIFICATION_GROUP_OF]-(:ClassificationGroup)
+WITH c, o, paths + COLLECT(path) AS paths
+	MATCH path=(o)-[:SURVEYED_FOR]->(s:Survey), (o)<-[:OFFERED_IN]-(o_cit)<-[:PROVINCE_OF]-(o_pro:Province)<-[:REGION_OF]-(o_reg:Region)
+WITH c, o, s, paths + COLLECT(path) AS paths
+	MATCH path=(s)<-[:DEPARTMENT_OF]-(d:Department)
+WITH c, o, s, paths + COLLECT(path) AS paths
+	MATCH path=(s)<-[:CLASSIFICATION_OF]-(:Classification)<-[:CLASSIFICATION_GROUP_OF]-(:ClassificationGroup)
+WITH paths + COLLECT(path) AS paths
+	CALL apoc.gephi.add('http://10.1.51.82:8080','workspace0', paths) yield nodes, relationships, time
+RETURN time
