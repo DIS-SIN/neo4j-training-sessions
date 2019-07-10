@@ -99,6 +99,8 @@ CREATE INDEX ON :Department(name);
 //
 CREATE CONSTRAINT ON (n:Survey) ASSERT n.uid IS UNIQUE;
 CREATE INDEX ON :Survey(date);
+CREATE INDEX ON :Survey(classification);
+CREATE INDEX ON :Survey(department);
 //relationships:
 // - Course
 // - Question (answer)
