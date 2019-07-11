@@ -30,7 +30,7 @@ RETURN paths + COLLECT(path) AS paths;
 // graph view
 //
 MATCH path=(c:Course {code: "G131"})-[:COURSE_OF]->(o:Offering)
-   WHERE o.start_date = DATE('2019-04-03')
+   WHERE o.start_date = DATE('2019-04-05')
 WITH c, o, COLLECT(path) AS paths
 	MATCH path=(o)-[:REGISTERED_FOR]->(r:Registration)<-[:LEARNER_OF]-(l:Learner)<-[:LOCATED_IN]-(l_cit)<-[:PROVINCE_OF]-(l_pro:Province)<-[:REGION_OF]-(l_reg:Region)
 RETURN paths + COLLECT(path) AS paths;
@@ -70,7 +70,7 @@ WITH DISTINCT(r.date) AS d, COLLECT(r) AS registrations, o, c
 WITH c, o, d, registrations
 	CALL apoc.create.vNode(['Registrations'], {date: d}) YIELD node AS r
 	CALL apoc.create.vRelationship(o, 'HAS', {count: SIZE(registrations)}, r) yield rel
-RETURN c, o, rel, r
+RETURN c, o, rel, r;
 //
 //
 // explore-2d-course-offering-survey
@@ -94,7 +94,7 @@ WITH DISTINCT(s.date) AS d, COLLECT(s) AS surveys, o, c
 WITH c, o, d, surveys
 	CALL apoc.create.vNode(['Surveys'], {date: d}) YIELD node AS r
 	CALL apoc.create.vRelationship(o, 'HAS', {count: SIZE(surveys)}, r) yield rel
-RETURN c, o, rel, r
+RETURN c, o, rel, r;
 //
 //
 // explore-2e-course-offering-registration-confirmed-survey
@@ -213,47 +213,31 @@ WITH i, c, w
 WITH DISTINCT(i) AS i, COLLECT([rel, c]) AS cc
 RETURN i, cc ORDER BY SIZE(cc) DESC LIMIT 5;
 //
-////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
-MATCH (i1:Instructor)
-WITH i1
-  MATCH (i2:Instructor) WHERE i2 <> i1
-WITH i1, i2
-  MATCH (i1)-[:INSTRUCTOR_OF]->(o)<-[:INSTRUCTOR_OF]-(i2)
-WITH DISTINCT(i2) AS i2, i1, COUNT(DISTINCT(o)) AS oc
-  MERGE (i1)-[r1:TOGETHER]->(i2)
-    ON CREATE SET r1.c = oc
-  MERGE (i2)-[r2:TOGETHER]->(i1)
-    ON CREATE SET r2.c = oc;
+// insight-1b-top-5-most-collaborate-instructors
 //
-CALL algo.pageRank.stream('Instructor', 'TOGETHER', {iterations:20, dampingFactor:0.85})
-	YIELD nodeId, score
-RETURN algo.asNode(nodeId).name AS instructor_name, score
-	ORDER BY score DESC LIMIT 20;
+CALL algo.closeness.harmonic(
+  'MATCH (i:Instructor) RETURN id(i) AS id',
+  'MATCH (i1:Instructor)-[:INSTRUCTOR_OF*2]-(i2:Instructor) RETURN id(i1) as source, id(i2) as target',
+  {graph:'cypher', writeProperty: 'centrality'}
+);
 //
-CALL algo.pageRank.stream('Instructor', 'TOGETHER', {iterations:20, dampingFactor:0.85})
-	YIELD nodeId, score
-WITH algo.asNode(nodeId).name AS instructor_name, score
-	ORDER BY score DESC LIMIT 20
-WITH instructor_name
-	MATCH path=(i:Instructor {name: instructor_name})-[:TOGETHER]-(oi:Instructor)
-    	WHERE oi <> i
-WITH COLLECT(path) AS paths
-	CALL apoc.gephi.add('http://10.0.1.167:8080','workspace0', paths) yield nodes, relationships, time
-RETURN time;
+MATCH (i:Instructor)
+WITH i ORDER BY i.centrality DESC LIMIT 5
+WITH i
+	MATCH (i)-[:INSTRUCTOR_OF*2]-(oi:Instructor)
+WITH DISTINCT(oi), i, COUNT(*) AS ic
+  CALL apoc.create.vRelationship(i, 'COLLABORATE', {count: ic}, oi) yield rel
+RETURN i, oi, rel;
 //
-////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
-CALL algo.closeness.harmonic.stream('Instructor', 'TOGETHER')
-	YIELD nodeId, centrality
-RETURN algo.asNode(nodeId).name AS instructor, centrality ORDER BY centrality DESC LIMIT 20;
+// insight-1c-instructors-communities
 //
-CALL algo.louvain('Instructor', 'TOGETHER', {write:true, writeProperty:'community'})
-YIELD nodes, communityCount, iterations, loadMillis, computeMillis, writeMillis;
+CALL algo.louvain(
+  'MATCH (i:Instructor) RETURN id(i) AS id',
+  'MATCH (i1:Instructor)-[r:INSTRUCTOR_OF*2]-(i2:Instructor) RETURN id(i1) AS source, id(i2) AS target, COUNT(DISTINCT(r)) AS weight',
+  {graph:'cypher', write: true}
+);
 //
 MATCH (i:Instructor)
   WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
@@ -262,11 +246,14 @@ MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
 RETUDN path;
 //
 MATCH (i:Instructor)
-  WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
-MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
-  WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
-WITH COLLECT(path) AS paths
-  CALL apoc.gephi.add('http://10.0.1.167:8080','workspace0', paths) yield nodes, relationships, time
-RETURN time;
+WITH DISTINCT(i.community) AS c, COLLECT(i) AS ic
+WITH c, ic
+	WHERE SIZE(ic) > 1
+WITH c, ic ORDER BY SIZE(ic) DESC LIMIT 5
+WITH c, apoc.coll.zip(REVERSE(TAIL(REVERSE(ic))), TAIL(ic)) AS pairs
+	UNWIND pairs AS pair
+WITH c, pair[0] AS i1, pair[1] AS i2
+	CALL apoc.create.vRelationship(i1, 'COLLABORATE', {count: c}, i2) yield rel
+RETURN i1, i2, rel;
 //
 ////////////////////////////////////////////////////////////////////////

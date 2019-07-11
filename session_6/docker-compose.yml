@@ -7,16 +7,16 @@ services:
 # https://neo4j.com/developer/docker-run-neo4j/
 ################################################################################
 
-  neo4j:
+  neo4j-session-6:
     build:
       context: ./neo4j
       dockerfile: Dockerfile
     image: neo4j-3.5.6:aa
-    hostname: neo4j
-    container_name: neo4j
+    hostname: session-6
+    container_name: session-6
     ports:
-      - 7474:7474
-      - 7687:7687
+      - 7777:7474
+      - 8888:7687
     volumes:
       - ${NEO4J_GDB_DATA}:/var/lib/neo4j/data
       - ${NEO4J_GDB_IMPT}:/var/lib/neo4j/import

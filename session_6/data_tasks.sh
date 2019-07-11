@@ -6,13 +6,11 @@ if [ $# -lt 1 ]; then
   echo "      s: initialize with registration/survey data"
   echo "      r: restore the graph database"
   echo "      n: normalizing initial data"
-  echo "      d: perform data discovery tasks"
   echo "      b: backup the graph database"
   echo "  EXAMPLES:"
   echo "      ./data_tasks.sh s: initialize with registration/survey data"
   echo "      ./data_tasks.sh r: restore the graph database from a previous copy"
   echo "      ./data_tasks.sh n: normalizing initial data"
-  echo "      ./data_tasks.sh d: perform data discovery tasks"
   echo "      ./data_tasks.sh b: backup the graph database only"
   echo " NOTE: order of (optional) execution is s -> n -> d -> b"
   exit
@@ -79,23 +77,6 @@ fi
 if [[ $commands == *"n"* ]]; then
   printf "Normalizing in progress...\n"
   (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_normalization.cql
-  printf "Done.\n"
-fi
-
-if [[ $commands == *"d"* ]]; then
-  printf "Discovery in progress...\n"
-
-  echo 'Wait for Neo4j ...'
-  end="$((SECONDS+300))"
-  while true; do
-    console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
-    [[ $console_log = *"3.5"*  ]] && break
-    [[ "${SECONDS}" -ge "${end}" ]] && exit 1
-    sleep 1
-  done
-
-  printf "Snapshot report ...\n"
-  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < graph_db_report.cql
   printf "Done.\n"
 fi
 
