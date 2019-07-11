@@ -114,7 +114,7 @@ In the `Streaming` tab, next to the `Layout`, choose `Master Server`, *right* cl
 
 In `Neo4j` browser, type the following query to start streaming result to Gephi. Note that it might not be successful if you have made changes to the project *before* starting the `Master Server` in Gephi, in that case, stop it and restart it.
 
-All courses with offerings in between `2019-04-01` and `2019-04-30`
+All courses with offerings in between `2019-04-01` and `2019-04-30` (lookup for your host IP and replace the IP below):
 
     MATCH (c:Course)<-[:BUSINESS_TYPE_OF]-(business_type:BusinessType)
       WHERE business_type.name IN ['Instructor-Led', 'Events']
@@ -130,7 +130,7 @@ All courses with offerings in between `2019-04-01` and `2019-04-30`
 
   ![Customized](images/gephi-april-courses.png)
 
-All instructors, courses, and offerings
+All instructors, courses, and offerings (lookup for your host IP and replace the IP below):
 
     MATCH path=(i:Instructor)-[:INSTRUCTOR_OF]->(o:Offering)<-[:COURSE_OF]-(c:Course)
     WITH COLLECT(path) AS paths
@@ -175,7 +175,7 @@ All instructors' communities
 
     ![Customized](images/instructor-communities.png)
 
-- Streaming to `Gephi`:
+- Streaming to `Gephi` (lookup for your host IP and replace the IP below)
 
       MATCH (i:Instructor)
         WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
