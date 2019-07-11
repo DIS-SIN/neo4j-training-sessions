@@ -63,10 +63,10 @@
 
 6. Configure the `Neo4jSinkConnector` with `connect`:
 
-      curl -X POST http://localhost:8083/connectors \
-        -H 'Content-Type:application/json' \
-        -H 'Accept:application/json' \
-        -d @contrib.sink.avro.neo4j.json
+        curl -X POST http://localhost:8083/connectors \
+          -H 'Content-Type:application/json' \
+          -H 'Accept:application/json' \
+          -d @contrib.sink.avro.neo4j.json
 
         {  
           "name":"Neo4jSinkConnector",
@@ -109,7 +109,7 @@
 
   - Run test:
 
-          java -jar neo4j-streams-sink-tester-1.0.jar -t avro-topic -f AVRO -e 50
+          java -jar neo4j-streams-sink-tester-1.0.jar -t my-topic -f AVRO -e 50
 
           log4j:WARN No appenders could be found for logger (org.apache.kafka.clients.producer.ProducerConfig).
           log4j:WARN Please initialize the log4j system properly.
@@ -214,6 +214,9 @@ That's why solution based on the first alternative is advised.
         http://localhost:8082/consumers/my_avro_consumer/instances/my_consumer_instance/records
 
         [{"topic":"my-topic","key":null,"value":{"name":"Bong","surname":"Doan"},"partition":0,"offset":0},{"topic":"my-topic","key":null,"value":{"name":"Bong","surname":"Doan"},"partition":0,"offset":1},{"topic":"my-topic","key":null,"value":{"name":"Thuc","surname":"Doan"},"partition":0,"offset":2},{"topic":"my-topic","key":null,"value":{"name":"Quan","surname":"Doan"},"partition":0,"offset":3},{"topic":"my-topic","key":null,"value":{"name":"X","surname":"Man"},"partition":0,"offset":4}]
+All steps below can be executed by:
+
+        ./test_rest_consumer.sh
 
 2. Producer message via REST Proxy:
 
