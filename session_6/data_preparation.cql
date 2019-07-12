@@ -240,12 +240,6 @@ CALL algo.louvain(
 );
 //
 MATCH (i:Instructor)
-  WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
-MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
-  WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
-RETUDN path;
-//
-MATCH (i:Instructor)
 WITH DISTINCT(i.community) AS c, COLLECT(i) AS ic
 WITH c, ic
 	WHERE SIZE(ic) > 1
