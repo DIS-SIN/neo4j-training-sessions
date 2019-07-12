@@ -188,7 +188,7 @@
     * Using `Harmonic Centrality` and `Louvain Community Detection`
 
 #### For more information:
-- [Presentation]()
+- No presentation for this session, only hands-on.
 
 #### For more information:
 - [Hands-on](/session_6/README.md)
