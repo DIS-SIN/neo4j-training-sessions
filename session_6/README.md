@@ -1,6 +1,6 @@
-# Data visualization
+# Graph exploration and algorithms
 
-## Visualizing graph data and interact with them
+## Visually exploring graph data and interact with them
 
 Graph data visualization not only consists of exploring graph entities and their relationships, but also using graph algorithms to detect important features.
 
@@ -291,4 +291,4 @@ There are several approaches for visualizations: casual explorers, data research
         	CALL apoc.create.vRelationship(i1, 'COLLABORATE', {count: c}, i2) yield rel
         RETURN i1, i2, rel;
 
-![Neo4j browser](images/insight-1c-instructors-communities.png) 
+![Neo4j browser](images/insight-1c-instructors-communities.png)
