@@ -10,7 +10,7 @@
 
 1. Setup environment variables:
 
-        ./set_env.sh
+        source ./set_env.sh
 
 2. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 
