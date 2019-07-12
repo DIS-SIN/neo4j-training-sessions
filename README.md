@@ -164,3 +164,31 @@
 
 #### For more information:
 - [Hands-on](/session_5/README.md)
+
+---
+
+## Session 6: Graph exploration and algorithms
+
+### Business case
+- Objectives:
+
+  + Demonstrate capabilities of exploring the graph visually
+  + Using virtual graph to group, delegate, refactor subgraphs
+  + Showing capabilities with tabular data
+
+- Approach:
+  + CSPS registration/survey dataset
+  + Browser
+
+### Technology aspects
+
+  + Tools:
+    * Exploration with pure `Cypher`
+    * Using `virtual` `nodes` and `relationships`
+    * Using `Harmonic Centrality` and `Louvain Community Detection`
+
+#### For more information:
+- [Presentation]()
+
+#### For more information:
+- [Hands-on](/session_6/README.md)
