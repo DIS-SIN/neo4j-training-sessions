@@ -12,8 +12,8 @@ services:
       context: ./neo4j
       dockerfile: Dockerfile
     image: neo4j-3.5.6:aa
-    hostname: session-6
-    container_name: session-6
+    hostname: neo4j-session-6
+    container_name: neo4j-session-6
     ports:
       - 7777:7474
       - 8888:7687
