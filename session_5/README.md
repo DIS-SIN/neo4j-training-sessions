@@ -12,7 +12,7 @@ There are several approaches for visualizations: casual explorers, data research
 
 1. Setup environment variables:
 
-        ./set_env.sh
+        source ./set_env.sh
 
 2. Get a compressed copy of [registration/survey Neo4j database](https://drive.google.com/open?id=1r4mc6piO86ELTtRFZP-c8a5qpac4LTU3) to, for example, local `Downloads` directory.
 
