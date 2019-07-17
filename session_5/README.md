@@ -14,7 +14,11 @@ There are several approaches for visualizations: casual explorers, data research
 
         source ./set_env.sh
 
-2. Get a compressed copy of [registration/survey Neo4j database](https://drive.google.com/open?id=1r4mc6piO86ELTtRFZP-c8a5qpac4LTU3) to, for example, local `Downloads` directory.
+2. Get a compressed copy of `neo4j` database:
+
+For Linux/Mac OS X: Download from [`csps_survey_gdb.tar.gz`](https://drive.google.com/open?id=1r4mc6piO86ELTtRFZP-c8a5qpac4LTU3) to, for example, local `Downloads` directory.
+
+        (you should be in neo4j-training-sessions/session_5 now)
 
         mkdir neo4j/data
         mv ~/Download/csps_survey_gdb.tar.gz neo4j/data/.
@@ -22,12 +26,23 @@ There are several approaches for visualizations: casual explorers, data research
         tar xzvf csps_survey_gdb.tar.gz
         sudo chmod -R 777 databases
 
-        (you might need to type your password here)
+  You might need to type your password now.
 
         rm csps_survey_gdb.tar.gz
         cd ../..
 
-        (you should be in neo4j-training-sessions/session_5 now)
+  You should be in neo4j-training-sessions/session_5 now.
+
+
+For Windows: Download from [`csps-2019-07003.zip`](https://drive.google.com/open?id=1D22qYwnmCPNhXfo-1XanUQD5YkaqU2Gt) to, for example, local `Downloads`. In `git bash`:
+
+  You should be in neo4j-training-sessions/session_5 now.
+
+        mkdir neo4j/data
+
+  Unzip `csps-2019-07003.zip` to this directory.
+
+        chmod -R 777 noe4j/data/databases    
 
 3. Build the dockers.
 
