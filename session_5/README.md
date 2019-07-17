@@ -186,7 +186,7 @@ All instructors' communities
         WITH DISTINCT(i.community) AS cc, COLLECT(i.name) AS i_list
       MATCH path=(i1:Instructor)-[:TOGETHER]-(i2:Instructor)
         WHERE i1.name IN i_list AND i2.name IN i_list AND i1.name <> i2.name
-      RETUDN path
+      RETURN path
 
     ![Customized](images/instructor-communities.png)
 
