@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+################################################################################
+# neo4j
+# https://neo4j.com/developer/docker-run-neo4j/
+################################################################################
+
+  neo4j-session-7:
+    build:
+      context: ./neo4j
+      dockerfile: Dockerfile
+    image: neo4j-3.5.6:aag
+    hostname: neo4j-session-7
+    container_name: neo4j-session-7
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - ${NEO4J_GDB_DATA}:/var/lib/neo4j/data
+      - ${NEO4J_GDB_IMPT}:/var/lib/neo4j/import
+      - ${NEO4J_GDB_LOGS}:/logs
+    environment:
+      - NEO4J_AUTH=neo4j/##dis@da2019##
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_dbms_memory_heap_initial__size=2G
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
+      - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_http_timeout_connect=60000
+      - NEO4J_apoc_http_timeout_read=120000
+      - NEO4J_apoc_jobs_pool_num__threads=4
+      - NEO4J_apoc_jobs_schedule_num__threads=4

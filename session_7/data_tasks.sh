@@ -24,7 +24,7 @@ HTTP_HOST_PORT=localhost:7474
 BOLT_HOST_PORT=localhost:7687
 USER_NAME=neo4j
 PASSWORD="##dis@da2019##"
-CONTAINER_NAME=neo4j-session-6
+CONTAINER_NAME=neo4j-session-7
 BACKUP_DIRECTORY=../../../..
 CURRENT=$PWD
 
@@ -57,7 +57,7 @@ if [[ $commands == *"r"* ]]; then
   docker-compose down \
   && cd neo4j/data \
   && sudo rm -rf databases \
-  && sudo tar xzvf $BACKUP_DIRECTORY/session_6_gdb.tar.gz \
+  && sudo tar xzvf $BACKUP_DIRECTORY/session_7_gdb.tar.gz \
   && sudo chmod -R 777 databases \
   && cd ../.. \
   && docker-compose up -d
@@ -85,7 +85,7 @@ if [[ $commands == *"b"* ]]; then
 
   docker-compose down \
   && cd neo4j/data \
-  && tar czvf $BACKUP_DIRECTORY/session_6_gdb.tar.gz databases \
+  && tar czvf $BACKUP_DIRECTORY/session_7_gdb.tar.gz databases \
   && cd ../.. \
   && docker-compose up -d \
 

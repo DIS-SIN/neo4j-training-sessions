@@ -152,7 +152,11 @@ if [[ $commands == *"i"* ]]; then
   fi
 
   printf "Convert data ...\n"
-  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert_simple.cql
+  printf "Done.\n"
+
+  printf "Normalize data ...\n"
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_normalization.cql
   printf "Done.\n"
 
   printf "Export statistics ...\n"

@@ -45,7 +45,7 @@ CALL apoc.export.csv.query(
 		earliest_start_date,
 		survey_count
 		MATCH (c)-[:COURSE_OF]->(:Offering)-[:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'})
-			WHERE earliest_start_date >= r.date - DURATION('P7D')
+			WHERE earliest_start_date >= r.date
 	WITH
 		DISTINCT(c.code) AS course_code,
 		c.title AS course_title,
@@ -61,6 +61,37 @@ CALL apoc.export.csv.query(
 	'/csps/reports/online_survey.csv',
 	{}
 );
+
+// CALL apoc.export.csv.query(
+// 	"MATCH (c:Course)<-[:BUSINESS_TYPE_OF]-(business_type:BusinessType)
+// 		WHERE business_type.name IN ['Online']
+// 	WITH c
+// 		MATCH (c)-[:COURSE_OF]->(:Offering)-[:SURVEYED_FOR]->(s:Survey)
+// 	WITH
+// 		DISTINCT(c) AS c,
+// 		MIN(s.date) AS earliest_start_date,
+// 		COUNT(DISTINCT(s)) AS survey_count
+// 	WITH
+// 		c,
+// 		earliest_start_date,
+// 		survey_count
+// 		MATCH (c)-[:COURSE_OF]->(:Offering)-[:REGISTERED_FOR]->(r:Registration {status: 'Confirmed'})
+// 			WHERE earliest_start_date >= r.date - DURATION('P7D')
+// 	WITH
+// 		DISTINCT(c.code) AS course_code,
+// 		c.title AS course_title,
+// 		survey_count,
+// 		COUNT(DISTINCT(r)) AS confirmed_registration_count
+// 	RETURN
+// 		course_code,
+// 		course_title,
+// 		confirmed_registration_count,
+// 		survey_count,
+// 		ROUND(10000.0*survey_count/(1.0*confirmed_registration_count))/100.0 AS response_rate
+// 			ORDER BY response_rate DESC;",
+// 	'/csps/reports/online_survey.csv',
+// 	{}
+// );
 
 CALL apoc.export.csv.query(
 	"MATCH (c:Course)<-[:BUSINESS_TYPE_OF]-(business_type:BusinessType)
