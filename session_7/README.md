@@ -1,5 +1,7 @@
 # The GRAND Stack
 
+![The GRAND Stcak](https://grandstack.io/docs/assets/img/grandstack_architecture.png)
+
 ## Modern tools for building full stack apps
 
 `GRANDstack` is a combination of technologies that work together to enable developers to build `data intensive full stack applications`. The components of `GRANDstack` are:
