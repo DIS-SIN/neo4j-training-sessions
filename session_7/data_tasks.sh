@@ -136,7 +136,7 @@ if [[ $commands == *"i"* ]]; then
   (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_schema.cql
   printf "Done.\n"
 
-  if [[ ! -d "neo4j/logs/import/csps/reports/" ]]; then
+  if [[ ! -d "neo4j/import/csps/reports/" ]]; then
     printf "Create report directory ...\n"
     sudo mkdir neo4j/import/csps/reports
     printf "Grant access ...\n"
@@ -144,7 +144,7 @@ if [[ $commands == *"i"* ]]; then
   fi
 
   printf "Convert data ...\n"
-  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert_simple.cql
   printf "Done.\n"
 
   printf "Normalize data ...\n"
@@ -166,18 +166,18 @@ if [[ $commands == *"b"* ]]; then
     && cd $CURRENT \
     && docker-compose up -d
 
-    echo 'Wait for Neo4j ...'
-    end="$((SECONDS+300))"
-    while true; do
-      console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
-      [[ $console_log = *"3.5"*  ]] && break
-      [[ "${SECONDS}" -ge "${end}" ]] && exit 1
-      sleep 1
-    done
+  echo 'Wait for Neo4j ...'
+  end="$((SECONDS+300))"
+  while true; do
+    console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
+    [[ $console_log = *"3.5"*  ]] && break
+    [[ "${SECONDS}" -ge "${end}" ]] && exit 1
+    sleep 1
+  done
 
-    printf "Snapshot report ...\n"
-    (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < graph_db_report.cql
-    printf "Done.\n"
+  printf "Snapshot report ...\n"
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < graph_db_report.cql
+  printf "Done.\n"
 
 fi
 

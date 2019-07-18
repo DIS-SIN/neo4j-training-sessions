@@ -1,6 +1,13 @@
 # The GRAND Stack
 
-## Neo4j from the browser
+## Modern tools for building full stack apps
+
+`GRANDstack` is a combination of technologies that work together to enable developers to build `data intensive full stack applications`. The components of `GRANDstack` are:
+
+- [`GraphQL`](https://graphql.org/) - A new paradigm for building APIs, `GraphQL` is a way of describing data and enabling clients to query it.
+- [`React`](https://reactjs.org/) - A `JavaScript` library for building component based reusable user interfaces.
+- [`Apollo`](https://www.apollographql.com) - A suite of tools that work together to create great `GraphQL` workflows.
+- [`Neo4j`](https://neo4j.com/) Database - The native graph database that allows you to model, store, and query your data the same way you think about it: as a graph.
 
 ## How to use this repository?
 
@@ -20,8 +27,162 @@
 
   Run:
 
-        ./data_task nei
+        ./data_task neib
 
   This will perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department.
 
-  Navigate to [Neo4j local instance](http://localhost:7474) and login.
+- Navigate to [Neo4j local instance](http://localhost:7474) and login. To visualize the `GraphQL` schema of your database, type:
+
+      CALL graphql.schema()
+
+  ![Database GraphQL schema](images/graphql-schema.png)
+
+- Get the string representation of the current schema:
+
+      RETURN graphql.getIdl()
+
+2. Using the `Neo4j-GraphQL` `database plugin`, explore `CSPS` database using `GraphiQL`.
+
+- First, download the `Electron`-based [`GraphiQL.app`](https://electronjs.org/apps/graphiql). Follow installation instructions.
+
+- Start the app, click on `Edit HTTP Headers`, `Add Header`.
+  + Type: `Authorization` into `Header name` and `Basic bmVvNGo6IyNkaXNAZGEyMDE5IyM=` into `Header value`.
+  + If you are not using default password, you can generate a `based64` encoded string by running this in the shell:
+
+        echo "Basic $(echo -n "neo4j:<neo4j_password>" | base64)"
+
+- In the `Query` box, type the following:
+
+      query CourseQuery($code: String!) {
+        Course(code: $code) {
+          code
+          title
+        }
+      }
+  In the `Query variables` box, type:
+
+      {
+        "code": "G414"
+      }
+
+  You should be able to see in the `Result` box:
+
+      {
+        "data": {
+          "Course": [
+            {
+              "code": "G414",
+              "title": "Manager Development Program - Phase 3 (G414)"
+            }
+          ]
+        },
+        "extensions": {
+          "type": "READ_ONLY"
+        }
+      }
+
+  ![Electron GraphiQL query](images/electron-graphiql.png)
+
+- Dynamic queries can also be executed as following:
+
+  Query for a `Course` with `Offering` location and `Instructor` information:
+
+      query CourseWithOfferings($code: String!) {
+        Course(code: $code) {
+          code
+          title
+      		courseOf {
+            uid
+            offeredIn {
+              name
+              provinceOf {
+                name
+                regionOf {
+                  name
+                }
+              }
+            }
+            instructorOf {
+              name
+            }
+          }
+        }
+      }
+
+  Same variable for `Query` `code`:
+
+      {
+        "code": "G414"
+      }
+
+  And more detailed results:
+
+      {
+        "data": {
+          "Course": [
+            {
+              "code": "G414",
+              "title": "Manager Development Program - Phase 3 (G414)",
+              "courseOf": [
+                {
+                  "uid": "111825",
+                  "offeredIn": {
+                    "name": "VIRTUAL EST / VIRTUELLE HNE",
+                    "provinceOf": {
+                      "name": "Ontario",
+                      "regionOf": {
+                        "name": "Ontario"
+                      }
+                    }
+                  },
+                  "instructorOf": {
+                    "name": "Jacquie Burgoyne"
+                  }
+                },
+                {
+                  "uid": "100459",
+                  "offeredIn": {
+                    "name": "NATIONAL CAPITAL REGION (NCR)",
+                    "provinceOf": {
+                      "name": "NCR/RCN",
+                      "regionOf": {
+                        "name": "NCR"
+                      }
+                    }
+                  },
+                  "instructorOf": {
+                    "name": "Karen Wienberg"
+                  }
+                },  
+                ...
+  ![Electron GraphiQL query](images/graphiql-custom-query.png)
+
+- Creating a custom query with `@cypher` `directive`:
+
+  In `Neo4j` browser:
+
+      CALL graphql.idl('
+      schema {
+         query: CoursesOfInstructor
+      }
+      type CoursesOfInstructor  {
+        coursesOfInstructor(name:String!): [Course] @cypher(statement:"MATCH (i:Instructor {name: $name})-[:INSTRUCTOR_OF]-()-[:COURSE_OF]-(c:Course) RETURN c")
+      }
+      ');
+
+  In `GraphiQL` query:
+
+      query q($instructor_name: String!) {
+        coursesOfInstructor(name: $instructor_name) {
+          code
+          title
+        }
+      }
+
+  As `GraphiQL` variable:
+
+      {
+        "instructor_name": "Benoit Le Blanc"
+      }
+
+  ![Electron GraphiQL query](images/graphiql-instructor-courses.png)
