@@ -119,6 +119,7 @@ if [[ $commands == *"i"* ]]; then
     && cd neo4j/data \
     && sudo rm -rf databases/graph.db \
     && sudo mv databases/csps_survey databases/graph.db \
+    && sudo chmod -R 777 databases \
     && cd $CURRENT \
     && docker-compose up -d
 
