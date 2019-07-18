@@ -64,13 +64,13 @@ if [[ $commands == *"i"* ]]; then
   echo 'Wait for Neo4j ...'
   end="$((SECONDS+300))"
   while true; do
-    console_log=`(docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
+    console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
     [[ $console_log = *"3.5"*  ]] && break
     [[ "${SECONDS}" -ge "${end}" ]] && exit 1
     sleep 1
   done
 
-  docker exec -i $CONTAINER_NAME neo4j-admin import \
+  docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/neo4j-admin import \
       --database=csps_survey \
       --nodes:BusinessType /import/csps/business_type.tsv \
       --nodes:City /import/csps/city.tsv \
@@ -125,14 +125,14 @@ if [[ $commands == *"i"* ]]; then
   echo 'Wait for Neo4j ...'
   end="$((SECONDS+300))"
   while true; do
-    console_log=`(docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
+    console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
     [[ $console_log = *"3.5"*  ]] && break
     [[ "${SECONDS}" -ge "${end}" ]] && exit 1
     sleep 1
   done
 
   printf "Creating initial schema ...\n"
-  (docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_schema.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_schema.cql
   printf "Done.\n"
 
   if [[ ! -d "neo4j/logs/import/csps/reports/" ]]; then
@@ -143,15 +143,15 @@ if [[ $commands == *"i"* ]]; then
   fi
 
   printf "Convert data ...\n"
-  (docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_convert.cql
   printf "Done.\n"
 
   printf "Normalize data ...\n"
-  (docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_normalization.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < data_normalization.cql
   printf "Done.\n"
 
   printf "Export statistics ...\n"
-  (docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < export_statistics.cql
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < export_statistics.cql
   printf "Done.\n"
 
 fi
@@ -168,14 +168,14 @@ if [[ $commands == *"b"* ]]; then
     echo 'Wait for Neo4j ...'
     end="$((SECONDS+300))"
     while true; do
-      console_log=`(docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
+      console_log=`(docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < check_apoc.cql  | grep 3 | head -n 1`
       [[ $console_log = *"3.5"*  ]] && break
       [[ "${SECONDS}" -ge "${end}" ]] && exit 1
       sleep 1
     done
 
     printf "Snapshot report ...\n"
-    (docker exec -i $CONTAINER_NAME cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < graph_db_report.cql
+    (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < graph_db_report.cql
     printf "Done.\n"
 
 fi
