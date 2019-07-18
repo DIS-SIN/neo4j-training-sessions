@@ -55,9 +55,9 @@ if [[ $commands == *"i"* ]]; then
 
   source ./set_env.sh \
     && docker-compose down \
-    && sudo rm -f neo4j/logs/import_report.log \
+    && rm -f neo4j/logs/import_report.log \
     && cd neo4j/data \
-    && sudo rm -rf databases \
+    && rm -rf databases \
     && cd $CURRENT \
     && docker-compose up -d
 
@@ -117,8 +117,8 @@ if [[ $commands == *"i"* ]]; then
   source ./set_env.sh \
     && docker-compose down \
     && cd neo4j/data \
-    && sudo rm -rf databases/graph.db \
-    && sudo mv databases/csps_survey databases/graph.db \
+    && rm -rf databases/graph.db \
+    && mv databases/csps_survey databases/graph.db \
     && cd $CURRENT \
     && docker-compose up -d
 
@@ -137,9 +137,9 @@ if [[ $commands == *"i"* ]]; then
 
   if [[ ! -d "neo4j/logs/import/csps/reports/" ]]; then
     printf "Create report directory ...\n"
-    sudo mkdir neo4j/import/csps/reports
+    mkdir neo4j/import/csps/reports
     printf "Grant access ...\n"
-    sudo chmod 777 neo4j/import/csps/reports
+    chmod 777 neo4j/import/csps/reports
   fi
 
   printf "Convert data ...\n"
