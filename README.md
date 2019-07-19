@@ -192,3 +192,34 @@
 
 #### For more information:
 - [Hands-on](/session_6/README.md)
+
+---
+
+## Session 7: The GRAND Stack
+
+### Business case
+
+Modern tools for building full stack apps
+
+GRANDstack is a combination of technologies that work together to enable developers to build data intensive full stack applications. The components of GRANDstack are:
+
+- GraphQL - A new paradigm for building APIs, GraphQL is a way of describing data and enabling clients to query it.
+- React - A JavaScript library for building component based reusable user interfaces.
+- Apollo - A suite of tools that work together to create great GraphQL workflows.
+- Neo4j Database - The native graph database that allows you to model, store, and query your data the same way you think about it: as a graph.
+
+### Technology aspects
+
+  + Tools:
+    * React with Apollo
+    * Neo4-GraphQL database plugin
+    * neo4j-graphql-js (& Neo4j Javascript Bolt driver)
+    * GraphiQL
+
+#### For more information:
+- No presentation for this session, only hands-on.
+
+#### For more information:
+- [Hands-on](/session_7/README.md)
+
+
