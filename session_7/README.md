@@ -13,17 +13,21 @@
 
 ## How to use this repository?
 
-### Setting up the environment:
+### Using `Neo4j GraphQL Database Plugin`:
 
 1. Getting the CSPS course/registration/survey database ready:
 
         source ./set_env.sh
 
+      ***Rename the `docker-compose.yml.with-plugin`***
+
+        mv docker-compose.yml.with-plugin docker-compose.yml
+
 - *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `neo4j/data` as `database`. Run:
 
         docker-compose up
 
-- *Option 2* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `neo4j/import/csps`.
+- *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `neo4j/import/csps`.
 
   *Important: Make sure that `python3` is installed and executable. If you use python virtual environment, enable it.*
 
@@ -43,7 +47,33 @@
 
       RETURN graphql.getIdl()
 
-2. Using the `Neo4j-GraphQL` `database plugin`, explore `CSPS` database using `GraphiQL`.
+2. Running `GraphQL` queries as `Cypher` ones.
+
+  Simple query:
+
+        CALL graphql.query('{ Course(code: "G131") { _id code title } }')
+
+  ![GraphQL query as Cypher](images/graphql-as-cypher.png)
+
+  Query *_* related entities:
+
+        WITH 'query ($code:String) { Course(code:$code) { code title courseOf(first:5) {uid start_date end_date} } }' AS query
+        CALL graphql.query(query, {code: "G131"})
+          YIELD result
+        UNWIND result.Course as course
+        RETURN course.code, course.title, [o IN course.courseOf | [o.uid, o.start_date, o.end_date]] AS offerings
+
+  ![GraphQL complex query as Cypher](images/graphql-as-cypher-related-entities.png)
+
+  Mutation:
+
+        CALL graphql.execute('mutation { createCourse(code:"007", title:"How to become James Bond")}')
+
+  ![GraphQL mutation as Cypher](images/graphql-as-cypher-mutation.png)
+
+  ![GraphQL mutation as Cypher](images/graphql-as-cypher-mutation-result.png)
+
+3. Using the `Neo4j-GraphQL` `database plugin`, explore `CSPS` database using `GraphiQL`.
 
 - First, download the `Electron`-based [`GraphiQL.app`](https://electronjs.org/apps/graphiql). Follow installation instructions.
 
@@ -188,3 +218,101 @@
       }
 
   ![Electron GraphiQL query](images/graphiql-instructor-courses.png)
+
+
+4. ***Rename the `docker-compose.yml.with-plugin`***
+
+    mv docker-compose.yml docker-compose.yml.with-plugin
+
+
+### Using `neo4j-graphql.js` with `Apollo Server`:
+
+1. ***Rename the `docker-compose.yml.with-apollo`***
+
+        mv docker-compose.yml.with-apollo docker-compose.yml
+
+        ./cleanup_docker.sh
+
+        ./data_task.sh ib
+
+2. Start `neo4j-session-7` and `apollo-server` docker containers:
+
+        docker-compose up
+
+3. Use `GraphiQL` and make a query to `http://localhost:4000/`
+
+        query {
+          Course(code: "G414") {
+            code
+            title
+          }
+        }
+
+  ![GraphiQL query to Apollo Server](images/apollo-server-query.png)
+
+- Note that auto-generated queries and resolvers might differ from `Neo4j GraphQL plugin`
+
+  Query:
+      query CourseWithOfferings($code: String!) {
+        Course(code: $code) {
+          code
+          title
+          course_of {
+            uid
+            citys {
+              name
+              provinces {
+                name
+                regions {
+                  name
+                }
+              }
+            }
+            instructors {
+              name
+            }
+          }
+        }
+      }
+
+  Variable:
+
+      {
+        "code": "G414"
+      }      
+
+  Result:
+
+  ![GraphiQL nested query to Apollo Server](images/apollo-server-nested-query.png)
+
+
+### Enabling `Apollo Client` to access the backend:
+
+      docker-compose up --build -d neo4j-session-7
+
+      docker-compose up --build -d apollo-server
+
+      docker-compose up --build apollo-client
+
+
+  With simple `query`-on-`render`:
+
+    query coursePaginateQuery(
+      $first: Int
+      $offset: Int
+      $orderBy: [_CourseOrdering]
+    ) {
+      Course(first: $first, offset: $offset, orderBy: $orderBy) {
+        _id
+        code
+        title
+      }
+    }
+
+  ![Apollo Client](images/apollo-client.png)
+
+  With column sorting:
+
+  ![Apollo Client](images/apollo-client-sort-1.png)
+
+  ![Apollo Client](images/apollo-client-sort-2.png)

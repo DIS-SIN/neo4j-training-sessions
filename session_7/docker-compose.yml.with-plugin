@@ -10,7 +10,7 @@ services:
   neo4j-session-7:
     build:
       context: ./neo4j
-      dockerfile: Dockerfile-with-apollo
+      dockerfile: Dockerfile-with-plugin
     image: neo4j-3.5.6:aag
     hostname: neo4j-session-7
     container_name: neo4j-session-7
@@ -27,7 +27,7 @@ services:
       - NEO4J_dbms_memory_heap_initial__size=2G
       - NEO4J_dbms_memory_heap_max__size=2G
       - NEO4J_dbms_memory_pagecache_size=1G
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algo.*,graphql.*
       - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
@@ -36,25 +36,4 @@ services:
       - NEO4J_apoc_http_timeout_read=120000
       - NEO4J_apoc_jobs_pool_num__threads=4
       - NEO4J_apoc_jobs_schedule_num__threads=4
-
-  apollo-server:
-    build: ./apollo-server
-    hostname: apollo-server
-    container_name: apollo-server
-    ports:
-      - 4000:4000
-    links:
-      - neo4j-session-7
-    depends_on:
-      - neo4j-session-7
-
-  apollo-client:
-    build: ./apollo-client
-    hostname: apollo-client
-    container_name: apollo-client
-    ports:
-      - 3000:3000
-    links:
-      - apollo-server
-    depends_on:
-      - apollo-server
+      - NEO4J_dbms_unmanaged__extension__classes=org.neo4j.graphql=/graphql
