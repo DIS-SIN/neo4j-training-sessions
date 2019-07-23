@@ -34,7 +34,7 @@
 
 - Test if GraphQL *augmented schema* is working:
 
-  Use `GraphiQL` app at endpoint "http://localhost:4000/", with query:
+  Use `GraphiQL` app at endpoint "http://localhost:4000/", with query `CoursesOfInstructor` defined as custom query in `Apollo Server`:
 
       query q($instructor_name: String!) {
       	CoursesOfInstructor(name: $instructor_name) {
@@ -52,3 +52,36 @@
   to obtain the following result:
 
   ![Test GraphQL augmented schema](images/test-augmented-schema.png)
+
+  Query for instructors, using `neo4j-graphql-js` `auto-generated` `queries` and `mutations`;
+
+      query instructorPaginateQuery(
+        $first: Int
+        $offset: Int
+        $orderBy: [_InstructorOrdering]
+        $filter: _InstructorFilter
+      ) {
+        Instructor(
+          first: $first
+          offset: $offset
+          orderBy: $orderBy
+          filter: $filter
+        ) {
+          _id
+          name
+          instructor_of {
+            uid
+          }
+        }
+      }
+
+  with variables
+
+      {
+        "first": 5,
+        "offset":0,
+        "orderBy": "name_asc",
+        "filter": {"name_contains": "Benoit"}
+      }
+
+![Test GraphQL augmented schema](images/test-graphql-autogen.png)
