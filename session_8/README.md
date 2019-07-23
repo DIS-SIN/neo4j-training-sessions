@@ -37,7 +37,7 @@
   Use `GraphiQL` app at endpoint "http://localhost:4000/", with query:
 
       query q($instructor_name: String!) {
-      	coursesOfInstructor(name: $instructor_name) {
+      	CoursesOfInstructor(name: $instructor_name) {
         	code
           title
       	}

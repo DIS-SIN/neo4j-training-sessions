@@ -77,7 +77,7 @@ class CourseList extends React.Component {
 
   getFilter = () => {
     return this.state.usernameFilter.length > 0
-      ? { display_name_contains: this.state.usernameFilter }
+      ? { name_contains: this.state.usernameFilter }
       : {};
   };
 
@@ -143,6 +143,7 @@ class CourseList extends React.Component {
           }}
         >
           {({ loading, error, data }) => {
+            console.log(this.getFilter());
             if (loading) return <p>Loading...</p>;
             if (error) return <p>Error</p>;
 
