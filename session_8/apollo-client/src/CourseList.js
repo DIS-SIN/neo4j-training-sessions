@@ -138,7 +138,7 @@ class CourseList extends React.Component {
           variables={{
             first: this.state.rowsPerPage,
             offset: this.state.rowsPerPage * this.state.page,
-            orderBy_i: this.state.orderBy_i + "_" + this.state.order_i,
+            orderBy: this.state.orderBy_i + "_" + this.state.order_i,
             filter: this.getFilter()
           }}
         >
@@ -210,7 +210,7 @@ class CourseList extends React.Component {
             name: this.state.usernameFilter,
             first: this.state.rowsPerPage,
             offset: this.state.rowsPerPage * this.state.page,
-            orderBy_c: this.state.orderBy_c + "_" + this.state.order_c
+            orderBy: this.state.orderBy_c + "_" + this.state.order_c
           }}
         >
           {({ loading, error, data }) => {
