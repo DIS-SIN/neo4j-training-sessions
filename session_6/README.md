@@ -325,3 +325,5 @@ There are several approaches for visualizations: casual explorers, data research
         WITH l, n, nc
         	CALL apoc.create.vRelationship(n,'TEACHES', {weight: nc}, l) YIELD rel
         RETURN n, l, rel
+
+  ![Neo4j browser](images/fan-club.png)
