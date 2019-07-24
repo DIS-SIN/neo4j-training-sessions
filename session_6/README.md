@@ -38,13 +38,13 @@ There are several approaches for visualizations: casual explorers, data research
 
 1. Lookup for all offerings with `start_date` at `2019-04-03`, showing all courses of those offerings, instructors, languages, locations (city-province-region) in a graph.
 
-    MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
-       WHERE o.start_date = DATE('2019-04-03')
-    WITH c, o, COLLECT(path) AS paths
-      MATCH path=(inst:Instructor)-[:INSTRUCTOR_OF]->(o)<-[:LANGUAGE_OF]-(lang:Language)
-    WITH c, o, paths + COLLECT(path) AS paths
-      MATCH path=(o)<-[:OFFERED_IN]-(o_cit)<-[:PROVINCE_OF]-(o_pro:Province)<-[:REGION_OF]-(o_reg:Region)
-    RETURN paths + COLLECT(path) AS paths;
+        MATCH path=(c:Course)-[:COURSE_OF]->(o:Offering)
+           WHERE o.start_date = DATE('2019-04-03')
+        WITH c, o, COLLECT(path) AS paths
+          MATCH path=(inst:Instructor)-[:INSTRUCTOR_OF]->(o)<-[:LANGUAGE_OF]-(lang:Language)
+        WITH c, o, paths + COLLECT(path) AS paths
+          MATCH path=(o)<-[:OFFERED_IN]-(o_cit)<-[:PROVINCE_OF]-(o_pro:Province)<-[:REGION_OF]-(o_reg:Region)
+        RETURN paths + COLLECT(path) AS paths;
 
 
 ![Neo4j browser](images/explore-1-course-offering-instructor-language-location.png)
@@ -256,11 +256,27 @@ There are several approaches for visualizations: casual explorers, data research
 
 2. Top 5 instructors `teaching together with other instructors`.
 
+  *Wikipedia*
+  ![Centrality from Wikipedia](https://upload.wikimedia.org/wikipedia/commons/1/11/6_centrality_measures.png):
+
+  Examples of A) *Betweenness centrality*, B) *Closeness centrality*, C) *Eigenvector centrality*, D) *Degree centrality*, E) *Harmonic Centrality* and F) *Katz centrality* of the same graph.
+
+  [Harmonic centrality](https://neo4j.com/docs/graph-algorithms/current/algorithms/harmonic-centrality/), [reference on Wikipedia](https://en.wikipedia.org/wiki/Centrality): *is a variant of closeness centrality, that was invented to solve the problem the original formula had when dealing with unconnected graphs. As with many of the centrality algorithms, it originates from the field of social network analysis.*
+
+  *For example, we might use it if we’re trying to identify where in the city to place a new public service so that it’s easily accessible for residents. If we’re trying to spread a message on social media we could use the algorithm to find the key influencers that can help us achieve our goal.*
+
         CALL algo.closeness.harmonic(
           'MATCH (i:Instructor) RETURN id(i) AS id',
           'MATCH (i1:Instructor)-[:INSTRUCTOR_OF*2]-(i2:Instructor) RETURN id(i1) as source, id(i2) as target',
           {graph:'cypher', writeProperty: 'centrality'}
         );
+
+        MATCH (i:Instructor)
+        WITH i
+          MATCH (i)-[:INSTRUCTOR_OF*2]-(oi:Instructor)
+        WITH DISTINCT(oi), i, COUNT(*) AS ic
+          CALL apoc.create.vRelationship(i, 'COLLABORATE', {count: ic}, oi) yield rel
+        RETURN i, oi, rel;
 
         MATCH (i:Instructor)
         WITH i ORDER BY i.centrality DESC LIMIT 5
@@ -273,6 +289,10 @@ There are several approaches for visualizations: casual explorers, data research
 ![Neo4j browser](images/insight-1b-top-5-most-collaborating-instructors.png)      
 
 3. Top 5 instructor communities - `group of instructors who used to teach together`.
+
+  [`Louvain` algorithm](https://neo4j.com/docs/graph-algorithms/current/algorithms/louvain/), [reference on wikipedia](https://en.wikipedia.org/wiki/Louvain_modularity): *'method of community detection is an algorithm for detecting communities in networks. It maximizes a modularity score for each community, where the modularity quantifies the quality of an assignment of nodes to communities by evaluating how much more densely connected the nodes within a community are, compared to how connected they would be in a random network.*
+
+  *The Louvain algorithm is one of the fastest modularity-based algorithms, and works well with large graphs. It also reveals a hierarchy of communities at different scales, which can be useful for understanding the global functioning of a network...'*
 
         CALL algo.louvain(
           'MATCH (i:Instructor) RETURN id(i) AS id',
@@ -292,3 +312,16 @@ There are several approaches for visualizations: casual explorers, data research
         RETURN i1, i2, rel;
 
 ![Neo4j browser](images/insight-1c-instructors-communities.png)
+
+4. `Fan club`:
+
+        MATCH (i:Instructor) WHERE i.name IN ["Benoit Le Blanc", "Benoit LeBlanc"]
+        WITH i
+        	CALL apoc.create.vNode(['Special Instructor'], {name: "Benoit LeBlanc"}) YIELD node AS n
+        WITH i, n
+        	MATCH (i)-[:INSTRUCTOR_OF]-()-[:REGISTERED_FOR]-()-[:LEARNER_OF]-(l:Learner)
+        WITH DISTINCT(l) AS l, n, COUNT(*) AS nc
+        WITH l, n, nc ORDER BY nc DESC LIMIT 100
+        WITH l, n, nc
+        	CALL apoc.create.vRelationship(n,'TEACHES', {weight: nc}, l) YIELD rel
+        RETURN n, l, rel

@@ -15,8 +15,8 @@ services:
     hostname: neo4j-session-6
     container_name: neo4j-session-6
     ports:
-      - 7777:7474
-      - 8888:7687
+      - 7474:7474
+      - 7687:7687
     volumes:
       - ${NEO4J_GDB_DATA}:/var/lib/neo4j/data
       - ${NEO4J_GDB_IMPT}:/var/lib/neo4j/import
