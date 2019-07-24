@@ -84,4 +84,10 @@
         "filter": {"name_contains": "Benoit"}
       }
 
-![Test GraphQL augmented schema](images/test-graphql-autogen.png)
+![Test GraphQL auto-generated query](images/test-graphql-autogen.png)
+
+- Use [`Lucid`](https://reactlucid.io/) to monitor and track requests & responses. You need Chrome browser to install the extension.
+
+  Open the `Lucid` extension in `Developer Tools` and then direct the browser to `http://localhost:3000`.
+
+![Test Lucid](images/test-lucid.png)
