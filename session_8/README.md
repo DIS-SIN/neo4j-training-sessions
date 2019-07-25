@@ -16,7 +16,7 @@
 
 - *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `neo4j/data` as `database`. Run:
 
-        docker-compose up --build neo4j-session-8
+        docker-compose up -d --build neo4j-session-8
 
 - *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `neo4j/import/csps`.
 
@@ -30,7 +30,11 @@
 
 ### Starting Neo4j, Apollo-Server, Apollo-Client
 
-      docker-compose up
+  (in each terminal)
+
+      docker-compose up -d --build neo4j-session-8
+      docker-compose up -d --build apollo-server
+      docker-compose up -d --build apollo-client
 
 - Test if GraphQL *augmented schema* is working:
 

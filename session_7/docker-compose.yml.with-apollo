@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 services:
 
@@ -36,6 +36,8 @@ services:
       - NEO4J_apoc_http_timeout_read=120000
       - NEO4J_apoc_jobs_pool_num__threads=4
       - NEO4J_apoc_jobs_schedule_num__threads=4
+    networks:
+      - backend
 
   apollo-server:
     build: ./apollo-server
@@ -43,10 +45,9 @@ services:
     container_name: apollo-server
     ports:
       - 4000:4000
-    links:
-      - neo4j-session-7
-    depends_on:
-      - neo4j-session-7
+    networks:
+      - frontend
+      - backend
 
   apollo-client:
     build: ./apollo-client
@@ -54,7 +55,11 @@ services:
     container_name: apollo-client
     ports:
       - 3000:3000
-    links:
-      - apollo-server
-    depends_on:
-      - apollo-server
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    name: frontend
+  backend:
+    name: backend

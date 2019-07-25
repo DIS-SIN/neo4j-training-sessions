@@ -19,13 +19,9 @@
 
         source ./set_env.sh
 
-      ***Rename the `docker-compose.yml.with-plugin`***
-
-        mv docker-compose.yml.with-plugin docker-compose.yml
-
 - *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `neo4j/data` as `database`. Run:
 
-        docker-compose up
+        docker-compose -f docker-compose.yml.with-plugin up
 
 - *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `neo4j/import/csps`.
 
@@ -220,24 +216,20 @@
   ![Electron GraphiQL query](images/graphiql-instructor-courses.png)
 
 
-4. ***Rename the `docker-compose.yml.with-plugin`***
-
-    mv docker-compose.yml docker-compose.yml.with-plugin
-
-
 ### Using `neo4j-graphql.js` with `Apollo Server`:
 
-1. ***Rename the `docker-compose.yml.with-apollo`***
+1. Cleanup
 
-        mv docker-compose.yml.with-apollo docker-compose.yml
+        ./cleanup_docker.sh docker-compose.yml.with-plugin
 
-        ./cleanup_docker.sh
-
+  (optional)
+  
         ./data_task.sh ib
 
 2. Start `neo4j-session-7` and `apollo-server` docker containers:
 
-        docker-compose up
+        docker-compose -f docker-compose.yml.with-apollo up -d --build neo4j-session-7
+        docker-compose -f docker-compose.yml.with-apollo up -d --build  apollo-server
 
 3. Use `GraphiQL` and make a query to `http://localhost:4000/`
 
@@ -288,11 +280,7 @@
 
 ### Enabling `Apollo Client` to access the backend:
 
-      docker-compose up --build -d neo4j-session-7
-
-      docker-compose up --build -d apollo-server
-
-      docker-compose up --build apollo-client
+      docker-compose -f docker-compose.yml.with-apollo up --build apollo-client
 
 
   With simple `query`-on-`render`:

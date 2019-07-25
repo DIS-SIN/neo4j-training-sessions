@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 services:
 
@@ -55,4 +55,6 @@ services:
 
 networks:
   frontend:
+    name: frontend
   backend:
+    name: backend
