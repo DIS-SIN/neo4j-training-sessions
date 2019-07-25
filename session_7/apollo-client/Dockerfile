@@ -4,7 +4,7 @@ RUN mkdir -p /app
 WORKDIR /app
 
 COPY package.json .
-RUN npm install && npm audit fix
+RUN npm install --no-optional
 COPY . .
 
 EXPOSE 3000
