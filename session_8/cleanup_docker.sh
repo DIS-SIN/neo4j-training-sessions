@@ -1,7 +1,12 @@
 #!/bin/bash
 
+if [ $# -lt 1 ]; then
+  echo "Usage: ./cleanup_docker.sh <docker-compose.yml file>"
+  exit
+fi
+
 source ./set_env.sh
-docker-compose down
+docker-compose -f $1 down
 docker system prune
 docker container rm -f $(docker container ls -aq)
 docker image rm -f $(docker image ls -aq)

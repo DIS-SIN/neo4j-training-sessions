@@ -1,0 +1,115 @@
+version: '3.5'
+
+################################################################################
+#
+# services
+#
+################################################################################
+services:
+
+  ####################
+  # node_consumer
+  #
+  node_consumer:
+    build:
+      context: ./node_consumer
+      dockerfile: Dockerfile
+    hostname: node_consumer
+    container_name: node_consumer
+    networks:
+      - mimir
+
+  ####################
+  # node_producer
+  #
+  node_producer:
+    build:
+      context: ./node_producer
+      dockerfile: Dockerfile
+    hostname: node_producer
+    container_name: node_producer
+    networks:
+      - mimir
+
+  ##############################################################################
+  #
+  # yggdrasil:
+  # - zookeeper, broker, schema_registry, connect, control_center, rest_proxy
+  # - all are connected to minir
+  #
+  ##############################################################################
+
+  ####################
+  # hadoop zookeeper
+  #
+  yggdrasil_zookeeper:
+    image: confluentinc/cp-zookeeper
+    hostname: yggdrasil_zookeeper
+    container_name: yggdrasil_zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - mimir
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+
+  ####################
+  # kafka broker
+  #
+  yggdrasil_broker:
+    image: confluentinc/cp-enterprise-kafka
+    hostname: yggdrasil_broker
+    container_name: yggdrasil_broker
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://yggdrasil_broker:9093,OUTSIDE://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      - CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS=yggdrasil_broker:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - KAFKA_METRIC_REPORTERS=io.confluent.metrics.reporter.ConfluentMetricsReporter
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS=1
+      - CONFLUENT_METRICS_ENABLE=true
+      - CONFLUENT_SUPPORT_CUSTOMER_ID=anonymous
+
+  ####################
+  # schema_registry
+  #
+  yggdrasil_schema_registry:
+    image: confluentinc/cp-schema-registry
+    hostname: yggdrasil_schema_registry
+    container_name: yggdrasil_schema_registry
+    ports:
+      - "8081:8081"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+    environment:
+      - SCHEMA_REGISTRY_HOST_NAME=yggdrasil_schema_registry
+      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=yggdrasil_zookeeper:2181
+
+################################################################################
+#
+# networks
+#
+################################################################################
+networks:
+  urd:
+    name: urd
+  mimir:
+    name: mimir

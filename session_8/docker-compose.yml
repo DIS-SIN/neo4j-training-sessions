@@ -1,7 +1,245 @@
 version: '3.5'
 
+################################################################################
+#
+# services
+#
+################################################################################
 services:
 
+  ##############################################################################
+  #
+  # valhalla:
+  # - valhalla, gungnir, gjallarhorn connected via urd
+  # - gungnir is connected to [a local] jotunheimr
+  # - gjallarhorn is connected to yggdrasil via mimir
+  #
+  ##############################################################################
+
+  ####################
+  # valhalla
+  #
+  valhalla:
+    build: ./valhalla
+    hostname: valhalla
+    container_name: valhalla
+    ports:
+      - 3000:3000
+    networks:
+      - urd
+    depends_on:
+      - gungnir
+      - gjallarhorn
+
+  ####################
+  # gungnir
+  #
+  gungnir:
+    build: ./gungnir
+    hostname: gungnir
+    container_name: gungnir
+    ports:
+      - 4000:4000
+    networks:
+      - urd
+      - mimir
+    depends_on:
+      - jotunheimr
+    command: ["./wait_for_jotunheimr.sh", "jotunheimr", "npm", "start"]
+
+  ####################
+  # gjallarhorn
+  #
+  gjallarhorn:
+    build: ./gjallarhorn
+    hostname: gjallarhornx
+    container_name: gjallarhorn
+    ports:
+      - 8000:8000
+    networks:
+      - urd
+      - mimir
+    depends_on:
+      - yggdrasil_broker
+
+  ##############################################################################
+  #
+  # yggdrasil:
+  # - zookeeper, broker, schema_registry, connect, control_center, rest_proxy
+  # - all are connected to minir
+  #
+  ##############################################################################
+
+  ####################
+  # hadoop zookeeper
+  #
+  yggdrasil_zookeeper:
+    image: confluentinc/cp-zookeeper
+    hostname: yggdrasil_zookeeper
+    container_name: yggdrasil_zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - mimir
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+
+  ####################
+  # kafka broker
+  #
+  yggdrasil_broker:
+    image: confluentinc/cp-enterprise-kafka
+    hostname: yggdrasil_broker
+    container_name: yggdrasil_broker
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://yggdrasil_broker:9093,OUTSIDE://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      - CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS=yggdrasil_broker:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - KAFKA_METRIC_REPORTERS=io.confluent.metrics.reporter.ConfluentMetricsReporter
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS=1
+      - CONFLUENT_METRICS_ENABLE=true
+      - CONFLUENT_SUPPORT_CUSTOMER_ID=anonymous
+
+  ####################
+  # schema_registry
+  #
+  yggdrasil_schema_registry:
+    image: confluentinc/cp-schema-registry
+    hostname: yggdrasil_schema_registry
+    container_name: yggdrasil_schema_registry
+    ports:
+      - "8081:8081"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+    environment:
+      - SCHEMA_REGISTRY_HOST_NAME=yggdrasil_schema_registry
+      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=yggdrasil_zookeeper:2181
+
+  ####################
+  # connect
+  #
+  yggdrasil_connect:
+    image: confluentinc/cp-kafka-connect
+    hostname: yggdrasil_connect
+    container_name: yggdrasil_connect
+    ports:
+      - "8083:8083"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+      - yggdrasil_schema_registry
+    volumes:
+      - ${YGGDRASIL_CONNECT_PLUGINS:-~/yggdrasil/connect/plugins}:/tmp/connect-plugins
+    environment:
+      - CONNECT_BOOTSTRAP_SERVERS=yggdrasil_broker:9093
+      - CONNECT_REST_ADVERTISED_HOST_NAME=yggdrasil_connect
+      - CONNECT_REST_PORT=8083
+      - CONNECT_GROUP_ID=compose-connect-group
+      - CONNECT_CONFIG_STORAGE_TOPIC=docker-connect-configs
+      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_OFFSET_FLUSH_INTERVAL_MS=10000
+      - CONNECT_OFFSET_STORAGE_TOPIC=docker-connect-offsets
+      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_STATUS_STORAGE_TOPIC=docker-connect-status
+      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://yggdrasil_schema_registry:8081
+      - CONNECT_VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://yggdrasil_schema_registry:8081
+      - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - CONNECT_PLUGIN_PATH=/usr/share/java,/tmp/connect-plugins,/usr/share/confluent-hub-components
+      - CONNECT_LOG4J_LOGGERS=org.apache.zookeeper=DEBUG,org.I0Itec.zkclient=DEBUG,org.reflections=ERROR
+    command:
+      - bash
+      - -c
+      - |
+        confluent-hub install --no-prompt neo4j/kafka-connect-neo4j:1.0.0
+        /etc/confluent/docker/run
+
+  ####################
+  # control_center
+  #
+  yggdrasil_control_center:
+    image: confluentinc/cp-enterprise-control-center
+    hostname: yggdrasil_control_center
+    container_name: yggdrasil_control_center
+    ports:
+      - "9021:9021"
+    networks:
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+      - yggdrasil_schema_registry
+      - yggdrasil_connect
+    environment:
+      - CONTROL_CENTER_BOOTSTRAP_SERVERS=yggdrasil_broker:9093
+      - CONTROL_CENTER_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - CONTROL_CENTER_CONNECT_CLUSTER=yggdrasil_connect:8083
+      - CONTROL_CENTER_REPLICATION_FACTOR=1
+      - CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS=1
+      - CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS=1
+      - CONFLUENT_METRICS_TOPIC_REPLICATION=1
+      - PORT=9021
+
+  ####################
+  # rest-proxy
+  #
+  yggdrasil_rest_proxy:
+    image: confluentinc/cp-kafka-rest
+    hostname: yggdrasil_rest_proxy
+    container_name: yggdrasil_rest_proxy
+    networks:
+      - urd
+      - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+      - yggdrasil_schema_registry
+      - yggdrasil_connect
+    ports:
+      - "8082:8082"
+    environment:
+      - KAFKA_REST_HOST_NAME=yggdrasil_rest_proxy
+      - KAFKA_REST_ZOOKEEPER_CONNECT=yggdrasil_zookeeper:2181
+      - KAFKA_REST_LISTENERS=http://0.0.0.0:8082
+      - KAFKA_REST_SCHEMA_REGISTRY_URL=http://yggdrasil_schema_registry:8081
+
+  ##############################################################################
+  #
+  # jotunheimr:
+  # - jotunheimr, halin
+  # - all connected to minir
+  #
+  ##############################################################################
+
+  ####################
+  # jotunheimr:
+  # - Neo4j + ALGO + APOC + GraphQL + Apache POI + Streams
+  #
   jotunheimr:
     build:
       context: ./jotunheimr
@@ -13,12 +251,12 @@ services:
       - 7474:7474
       - 7473:7473
       - 7687:7687
+    networks:
+      - mimir
     volumes:
       - ${NEO4J_GDB_DATA:-~/neo4j/data}:/data
       - ${NEO4J_GDB_IMPT:-~/neo4j/import}:/var/lib/neo4j/import
       - ${NEO4J_GDB_LOGS:-~/neo4j/logs}:/logs
-    networks:
-      - mimir
     environment:
       - NEO4J_AUTH=neo4j/##dis@da2019##
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
@@ -38,43 +276,28 @@ services:
       - NEO4J_apoc_spatial_geocode_osm_throttle=5000
       - NEO4J_streams_procedures_enable=true
       - NEO4J_streams_source_enabled=true
-      # - NEO4J_kafka_zookeeper_connect=zookeeper:2181
-      # - NEO4J_kafka_bootstrap_servers=broker:9093
+      - NEO4J_kafka_zookeeper_connect=yggdrasil_zookeeper:2181
+      - NEO4J_kafka_bootstrap_servers=yggdrasil_broker:9093
       - NEO4J_streams_sink_enabled=true
       - NEO4J_dbms_unmanaged__extension__classes=org.neo4j.graphql=/graphql
 
-  gungnir:
-    build: ./gungnir
-    hostname: gungnir
-    container_name: gungnir
-    ports:
-      - 4000:4000
-    networks:
-      - urd
-      - mimir
-    depends_on:
-      - jotunheimr
-    command: ["./wait_for_jotunheimr.sh", "jotunheimr", "npm", "start"]
-
-  gjallarhorn:
-    build: ./gjallarhorn
-    hostname: gjallarhornx
-    container_name: gjallarhorn
-    ports:
-      - 8000:8000
-    networks:
-      - urd
-      - mimir
-
-  valhalla:
-    build: ./valhalla
-    hostname: valhalla
-    container_name: valhalla
+  ####################
+  # halin
+  #
+  halin:
+    image: mdavidallen/halin:latest
+    hostname: halin
+    container_name: halin
     ports:
       - 3000:3000
     networks:
-      - urd
+      - mimir
 
+################################################################################
+#
+# networks
+#
+################################################################################
 networks:
   urd:
     name: urd
