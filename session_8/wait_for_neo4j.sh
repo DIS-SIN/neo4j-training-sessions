@@ -1,9 +1,9 @@
 #!/bin/bash
 
-BOLT_HOST_PORT=localhost:7687
+BOLT_HOST_PORT=$1:7687
 USER_NAME=neo4j
 PASSWORD="##dis@da2019##"
-CONTAINER_NAME=neo4j-session-8
+CONTAINER_NAME=$1
 
 echo 'Wait for Neo4j ...'
 end="$((SECONDS+300))"

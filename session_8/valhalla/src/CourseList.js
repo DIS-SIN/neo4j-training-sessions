@@ -48,7 +48,7 @@ class CourseList extends React.Component {
       order_i: "asc",
       orderBy_i: "name",
       page: 0,
-      rowsPerPage: 10,
+      rowsPerPage: 3,
       usernameFilter: ""
     };
   }
