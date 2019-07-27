@@ -14,11 +14,11 @@
 
         source ./set_env.sh
 
-- *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `neo4j/data` as `database`. Run:
+- *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `~/neo4j/data` as `database`. Run:
 
-        docker-compose up -d --build neo4j-session-8
+        docker-compose up -d --build jotunheimr
 
-- *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `neo4j/import/csps`.
+- *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `~/neo4j/import/csps`.
 
   *Important: Make sure that `python3` is installed and executable. If you use python virtual environment, enable it.*
 
@@ -28,17 +28,17 @@
 
   This will perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department.
 
-### Starting Neo4j, Apollo-Server, Apollo-Client
+### Starting jotunheimr, gungnir, valhalla
 
   (in each terminal)
 
-      docker-compose up -d --build neo4j-session-8
-      docker-compose up -d --build apollo-server
-      docker-compose up -d --build apollo-client
+      docker-compose up -d --build jotunheimr
+      docker-compose up -d --build gungnir
+      docker-compose up -d --build valhalla
 
 - Test if GraphQL *augmented schema* is working:
 
-  Use `GraphiQL` app at endpoint "http://localhost:4000/", with query `CoursesOfInstructor` defined as custom query in `Apollo Server`:
+  Use `GraphiQL` app at endpoint "http://localhost:4000/", with query `CoursesOfInstructor` defined as custom query in `gungnir`:
 
       query q($instructor_name: String!) {
       	CoursesOfInstructor(name: $instructor_name) {
