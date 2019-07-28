@@ -103,7 +103,7 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
 #### 1. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 
-    ./get_kafka_plugin.sh
+    ./install_kafka_plugin.sh
 
 The script downloads `neo4j-kafka-connect-neo4j-1.0.3.zip` from [neo4j-streams-3.5.3](https://github.com/neo4j-contrib/neo4j-streams/releases/download/3.5.3/) and expands it in `plugins` sub-directory.
 
@@ -164,7 +164,7 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
   to obtain the following result:
 
-  ![Test GraphQL augmented schema](images/test-augmented-schema.png)
+  ![Test GraphQL augmented schema](doc_images/test-augmented-schema.png)
 
   Query for instructors, using `neo4j-graphql-js` `auto-generated` `queries` and `mutations`;
 
@@ -197,7 +197,7 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
         "filter": {"name_contains": "Benoit"}
       }
 
-![Test GraphQL auto-generated query](images/test-graphql-autogen.png)
+![Test GraphQL auto-generated query](doc_images/test-graphql-autogen.png)
 
 #### 3. `valhalla` by `gungnir`
 
@@ -207,4 +207,4 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
   Open the `Lucid` extension in `Developer Tools` and then direct the browser to `http://localhost:3000`.
 
-![Test Lucid](images/test-lucid.png)
+![Test Lucid](doc_images/test-lucid.png)

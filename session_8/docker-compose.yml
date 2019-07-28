@@ -244,7 +244,7 @@ services:
     build:
       context: ./jotunheimr
       dockerfile: Dockerfile
-    image: neo4j-3.5.6:aagps
+    image: neo4j-3.5.8:aagps
     hostname: jotunheimr
     container_name: jotunheimr
     ports:
@@ -260,7 +260,7 @@ services:
       - yggdrasil_connect
     volumes:
       - ${NEO4J_GDB_DATA:-~/neo4j/data}:/data
-      - ${NEO4J_GDB_IMPT:-~/neo4j/import}:/var/lib/neo4j/import
+      - ${NEO4J_GDB_IMPT:-~/neo4j/import}:/import
       - ${NEO4J_GDB_LOGS:-~/neo4j/logs}:/logs
     environment:
       - NEO4J_AUTH=neo4j/##dis@da2019##
