@@ -253,6 +253,11 @@ services:
       - 7687:7687
     networks:
       - mimir
+    depends_on:
+      - yggdrasil_zookeeper
+      - yggdrasil_broker
+      - yggdrasil_schema_registry
+      - yggdrasil_connect
     volumes:
       - ${NEO4J_GDB_DATA:-~/neo4j/data}:/data
       - ${NEO4J_GDB_IMPT:-~/neo4j/import}:/var/lib/neo4j/import

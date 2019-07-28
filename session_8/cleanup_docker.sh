@@ -5,7 +5,6 @@ if [ $# -lt 1 ]; then
   exit
 fi
 
-source ./set_env.sh
 docker-compose -f $1 down
 docker system prune
 docker container rm -f $(docker container ls -aq)

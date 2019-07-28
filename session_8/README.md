@@ -99,15 +99,21 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
     ./cleanup_docker.sh docker-compose.yml-for-testing
 
-### B. Getting the database ready:
+### B. Getting ready:
 
-1. Getting the CSPS course/registration/survey database ready:
+#### 1. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 
-        source ./set_env.sh
+    ./get_kafka_plugin.sh
+
+The script downloads `neo4j-kafka-connect-neo4j-1.0.3.zip` from [neo4j-streams-3.5.3](https://github.com/neo4j-contrib/neo4j-streams/releases/download/3.5.3/) and expands it in `plugins` sub-directory.
+
+For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connector/kafka-connect-neo4j-sink/)
+
+#### 2. Getting the CSPS course/registration/survey database ready:
 
 - *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `~/neo4j/data` as `database`. Run:
 
-        docker-compose up -d --build jotunheimr
+      docker-compose build jotunheimr
 
 - *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `~/neo4j/import/csps`.
 
@@ -115,17 +121,29 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
   Run:
 
-        ./data_task neib
+      ./data_task neib
 
   This will perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department.
 
-### C. Starting jotunheimr, gungnir, valhalla
+#### C. Norse mythology
 
-  (in each terminal)
+#### 1. `jotunheimr`
 
-      docker-compose up -d --build jotunheimr
-      docker-compose up -d --build gungnir
-      docker-compose up -d --build valhalla
+    docker-compose up -d --build jotunheimr
+
+
+- Navigate to [Neo4j local instance](http://localhost:7474) and login. To visualize the `GraphQL` schema of your database, type:
+
+      CALL graphql.schema()
+
+
+- Get the string representation of the current schema:
+
+      RETURN graphql.getIdl()
+
+#### 2. `gungnir`
+
+    docker-compose up -d --build gungnir
 
 - Test if GraphQL *augmented schema* is working:
 
@@ -181,9 +199,12 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
 ![Test GraphQL auto-generated query](images/test-graphql-autogen.png)
 
+#### 3. `valhalla` by `gungnir`
+
+    docker-compose up -d --build valhalla
+
 - Use [`Lucid`](https://reactlucid.io/) to monitor and track requests & responses. You need Chrome browser to install the extension.
 
   Open the `Lucid` extension in `Developer Tools` and then direct the browser to `http://localhost:3000`.
 
 ![Test Lucid](images/test-lucid.png)
-__
