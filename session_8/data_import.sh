@@ -19,8 +19,12 @@ if [ $# -lt 1 ]; then
 fi
 
 commands=$1
+neo4j_arg=$2
 
-NEO4J_DIR="${$1:-~/neo4j}"
+NEO4J_DIR="${neo4j_arg:-~/neo4j}"
+echo $NEO4J_DIR
+
+exit
 
 if [[ ! -d "$NEO4J_DIR" ]]; then
   echo "No directory for neo4j found."
