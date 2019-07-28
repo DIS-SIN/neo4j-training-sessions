@@ -91,9 +91,9 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
   Note: *Tested on Mac OS X Mojave, Ubuntu Linux 18.04, and Windows 10*
 
-    docker-compose up --build node_producer
+    docker-compose up --build test_node_producer
 
-    docker-compose up --build node_consumer
+    docker-compose up --build test_node_consumer
 
 #### 5. Cleanup testing environment
 

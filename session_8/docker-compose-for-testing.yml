@@ -8,26 +8,26 @@ version: '3.5'
 services:
 
   ####################
-  # node_consumer
+  # test_node_consumer
   #
-  node_consumer:
+  test_node_consumer:
     build:
-      context: ./node_consumer
+      context: ./test_node_consumer
       dockerfile: Dockerfile
-    hostname: node_consumer
-    container_name: node_consumer
+    hostname: test_node_consumer
+    container_name: test_node_consumer
     networks:
       - mimir
 
   ####################
-  # node_producer
+  # test_node_producer
   #
-  node_producer:
+  test_node_producer:
     build:
-      context: ./node_producer
+      context: ./test_node_producer
       dockerfile: Dockerfile
-    hostname: node_producer
-    container_name: node_producer
+    hostname: test_node_producer
+    container_name: test_node_producer
     networks:
       - mimir
 
