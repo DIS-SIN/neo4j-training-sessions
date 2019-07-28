@@ -101,29 +101,43 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 
 ### B. Getting ready:
 
+#### 0. (Optional) Prerequisites for Windows users
+
+- Install [`git` clients for Windows](https://git-scm.com/download/win). Just download the package and follow installation instructions.
+- Open a `Git Bash` terminal. Install [`win-sudo`](https://github.com/imachug/win-sudo) by:
+      curl -s https://raw.githubusercontent.com/imachug/win-sudo/master/install.sh | sh
+
 #### 1. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 
     ./install_kafka_plugin.sh
 
-The script downloads `neo4j-kafka-connect-neo4j-1.0.3.zip` from [neo4j-streams-3.5.3](https://github.com/neo4j-contrib/neo4j-streams/releases/download/3.5.3/) and expands it in `plugins` sub-directory.
+The script downloads `neo4j-kafka-connect-neo4j-1.0.3.zip` from [neo4j-streams-3.5.3](https://github.com/neo4j-contrib/neo4j-streams/releases/download/3.5.3/) and expands it in `~/yggdrasil/connect/plugins` sub-directory.
+
+*Note: on Windows it will prompt for granting administrative privileges*
 
 For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connector/kafka-connect-neo4j-sink/)
 
 #### 2. Getting the CSPS course/registration/survey database ready:
 
-- *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `~/neo4j/data` as `database`. Run:
+- Start `jotunheimr`
 
       docker-compose build jotunheimr
 
-- *Option 2 (recommended)* (preferable if you want to know the data import, conversion, and normalization process): Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-) in `tsv` format, uncompress, and place the files in `~/neo4j/import/csps`.
+- Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-), uncompress, and place the `*.tsv` files in `~/neo4j/import/csps`.
 
-  *Important: Make sure that `python3` is installed and executable. If you use python virtual environment, enable it.*
+- Make sure that `python3` is installed and executable. If you use python virtual environment, for example at `~3.7.4`, enable it:
 
-  Run:
+  Mac OS X, Linux:
 
-      ./data_task neib
+      source ~/3.7.4/bin/activate
 
-  This will perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department.
+  Windows (`git bash`)
+
+      source ~/3.7.4/Scripts/activate
+
+- Perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department:
+
+      ./data_import.sh
 
 #### C. Norse mythology
 

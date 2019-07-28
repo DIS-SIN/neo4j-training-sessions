@@ -92,7 +92,7 @@ def write_relationships(output_file, headers, uid_pair_list, rows, split=False, 
 def load_registrations(input_file):
     rows = read_rows(input_file)
     if not rows:
-        print('ERROR reading [%s].' % output_file)
+        print('ERROR reading [%s].' % input_file)
         return
 
     input_dir = input_file[:input_file.rfind('/')+1]
@@ -298,7 +298,7 @@ def load_registrations(input_file):
 def load_surveys(input_file):
     rows = read_rows(input_file)
     if not rows:
-        print('ERROR reading [%s].' % output_file)
+        print('ERROR reading [%s].' % input_file)
         return
 
     input_dir = input_file[:input_file.rfind('/')+1]
