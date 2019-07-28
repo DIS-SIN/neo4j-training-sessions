@@ -1,33 +1,30 @@
 #!/bin/bash
 
-NEO4J_DIR=~/neo4j
-
 if [ $# -lt 1 ]; then
-  if [[ ! -d "$NEO4J_DIR" ]]; then
-    echo "Usage: ./data_import.sh <neo4j directory> <COMMANDS>"
-    echo "  COMMAND: "
-    echo "      n: normalize data"
-    echo "      e: extract entities and relationships"
-    echo "      i: import data"
-    echo "      a: after import processing"
-    echo "      s: export statistics"
-    echo "  EXAMPLES:"
-    echo "      ./data_import.sh n: normalize registration & survey data only"
-    echo "      ./data_import.sh e: extract entities and relationships only"
-    echo "      ./data_import.sh i: import data only"
-    echo "      ./data_import.sh a: after import processing only"
-    echo "      ./data_import.sh s: export statistics only"
-    echo "      ./data_import.sh rneis: run a n -> e -> i -> a -> s pipeline"
-    exit
-  fi
-else
-  NEO4J_DIR=$1
+  echo "Usage: ./data_import.sh <COMMANDS> <neo4j directory> "
+  echo "  COMMAND: "
+  echo "      n: normalize data"
+  echo "      e: extract entities and relationships"
+  echo "      i: import data"
+  echo "      a: after import processing"
+  echo "      s: export statistics"
+  echo "  EXAMPLES:"
+  echo "      ./data_import.sh n: normalize registration & survey data only"
+  echo "      ./data_import.sh e: extract entities and relationships only"
+  echo "      ./data_import.sh i: import data only"
+  echo "      ./data_import.sh a: after import processing only"
+  echo "      ./data_import.sh s: export statistics only"
+  echo "      ./data_import.sh rneis: run a n -> e -> i -> a -> s pipeline"
+  exit
 fi
 
-if [ $# -lt 2 ]; then
-  commands=neias
-else
-  commands=$2
+commands=$1
+
+NEO4J_DIR=~/neo4j:-$1
+
+if [[ ! -d "$NEO4J_DIR" ]]; then
+  echo "No directory for neo4j found."
+  exit
 fi
 
 res1=$(date +%s)
