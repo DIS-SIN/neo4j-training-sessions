@@ -20,7 +20,7 @@ fi
 
 commands=$1
 
-NEO4J_DIR=~/neo4j:-$1
+NEO4J_DIR="${$1:-~/neo4j}"
 
 if [[ ! -d "$NEO4J_DIR" ]]; then
   echo "No directory for neo4j found."
