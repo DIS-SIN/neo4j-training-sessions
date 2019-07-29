@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]; then
+if [ $# -lt 2 ]; then
   echo "Usage: ./data_import.sh <COMMANDS> <neo4j directory> "
   echo "  COMMAND: "
   echo "      n: normalize data"
@@ -18,16 +18,15 @@ if [ $# -lt 1 ]; then
   exit
 fi
 
+export MSYS_NO_PATHCONV=1
+
 commands=$1
-neo4j_arg=$2
-
-NEO4J_DIR="${neo4j_arg:-~/neo4j}"
-echo $NEO4J_DIR
-
-exit
+NEO4J_DIR=$2
 
 if [[ ! -d "$NEO4J_DIR" ]]; then
+  echo NEO4J_DIR=$NEO4J_DIR
   echo "No directory for neo4j found."
+  export MSYS_NO_PATHCONV=0
   exit
 fi
 
@@ -41,19 +40,30 @@ fi
 if [[ $commands == *"r"* ]]; then
   if [ ! -f "$NEO4J_DIR/import/csps/registration_data.tsv" ] || [ ! -f "$NEO4J_DIR/import/csps/survey_data.tsv" ] ; then
     echo "Required data files in $NEO4J_DIR/import/ directory: registration_data.tsv, survey_data.tsv"
+    export MSYS_NO_PATHCONV=0
     exit
   fi
 fi
 
 if [[ $commands == *"n"* ]]; then
   printf "\nNormalize registration & survey data ...\n"
-    ./import_scripts/header_normalizer.sh $NEO4J_DIR/import/csps/registration_data.tsv $NEO4J_DIR/import/csps/survey_data.tsv
+  ./import_scripts/header_normalizer.sh $NEO4J_DIR/import/csps/registration_data.tsv $NEO4J_DIR/import/csps/survey_data.tsv
   printf "Done.\n"
 fi
 
 if [[ $commands == *"e"* ]]; then
   printf "Extracting entities and relationships ...\n"
-    python import_scripts/prepare_data.py $NEO4J_DIR/import/csps/registration_data.tsv $NEO4J_DIR/import/csps/survey_data.tsv
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
+    MINGW*)
+      WIN_NEO4J_DIR=`echo $NEO4J_DIR |  sed 's~/c/~C:/~g'`
+      echo WIN_NEO4J_DIR=$WIN_NEO4J_DIR
+      python import_scripts/prepare_data.py $WIN_NEO4J_DIR/import/csps/registration_data.tsv $WIN_NEO4J_DIR/import/csps/survey_data.tsv
+      ;;
+    *)
+      python import_scripts/prepare_data.py $NEO4J_DIR/import/csps/registration_data.tsv $NEO4J_DIR/import/csps/survey_data.tsv
+      ;;
+  esac
   printf "Done.\n"
 fi
 
@@ -161,12 +171,7 @@ if [[ $commands == *"s"* ]]; then
 fi
 
 res2=$(date +%s)
-dt=$(echo "$res2 - $res1" | bc)
-dd=$(echo "$dt/86400" | bc)
-dt2=$(echo "$dt-86400*$dd" | bc)
-dh=$(echo "$dt2/3600" | bc)
-dt3=$(echo "$dt2-3600*$dh" | bc)
-dm=$(echo "$dt3/60" | bc)
-ds=$(echo "$dt3-60*$dm" | bc)
+diff=`echo $((res2-res1)) | awk '{printf "%02dh:%02dm:%02ds\n",int($1/3600),int($1%3600/60),int($1%60)}'`
+printf "\n[Data import] DONE. Total processing time: %s" $diff
 
-printf "\n[Data import] DONE. Total processing time: %d:%02d:%02d:%02d\n" $dd $dh $dm $ds
+export MSYS_NO_PATHCONV=0

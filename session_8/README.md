@@ -106,6 +106,7 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 - Install [`git` clients for Windows](https://git-scm.com/download/win). Just download the package and follow installation instructions.
 - Open a `Git Bash` terminal. Install [`win-sudo`](https://github.com/imachug/win-sudo) by:
       curl -s https://raw.githubusercontent.com/imachug/win-sudo/master/install.sh | sh
+- Install [`bc` for Windows](http://gnuwin32.sourceforge.net/downlinks/bc.php)
 
 #### 1. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 

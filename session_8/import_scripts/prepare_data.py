@@ -1,11 +1,12 @@
 import csv
+from pathlib import Path
 import traceback
 import sys
 
 def read_rows(input_file):
     rows, counter = [], 0
 
-    with open(input_file, 'rt') as in_tsv_file:
+    with open(input_file, 'rt', encoding='utf8', newline='\n') as in_tsv_file:
 
         print('[>>> %s]' % input_file, end='', flush=True)
         reader = csv.DictReader(in_tsv_file, delimiter='\t')
@@ -334,5 +335,11 @@ def load_surveys(input_file):
 
 
 if __name__ == '__main__':
+    if not Path(sys.argv[1]).exists():
+        print('File [%s] not found.' % sys.argv[1])
+        exit(1)
+    if not Path(sys.argv[2]).exists():
+    	print('File [%s] not found.' % sys.argv[2])
+    	exit(1)
     load_registrations(sys.argv[1])
     load_surveys(sys.argv[2])
