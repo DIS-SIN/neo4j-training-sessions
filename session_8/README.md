@@ -1,12 +1,14 @@
-# Visualizing CSPS data in Grand Stack application
+# Streaming and visualizing data
 
-## Demonstrating concepts of visualizing CSPS data
+## Demonstrating concepts of streaming and visualizing data
 
 - CSPS data consists of course/offering/registration/learner/survey/etc entities
 
 - `GRANDstack` is a combination of technologies that work together to enable developers to build `data intensive full stack applications`.
 
 ## How to use this repository?
+
+First install `docker` and `docker-compose`.
 
 ### A. Testing Kafka
 
@@ -106,7 +108,6 @@ Follow instructions on [nodefluent/node-sinek](https://github.com/nodefluent/nod
 - Install [`git` clients for Windows](https://git-scm.com/download/win). Just download the package and follow installation instructions.
 - Open a `Git Bash` terminal. Install [`win-sudo`](https://github.com/imachug/win-sudo) by:
       curl -s https://raw.githubusercontent.com/imachug/win-sudo/master/install.sh | sh
-- Install [`bc` for Windows](http://gnuwin32.sourceforge.net/downlinks/bc.php)
 
 #### 1. Get `Kafka Connect Neo4j Sink` from `Confluent`:
 
