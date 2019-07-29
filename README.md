@@ -231,3 +231,6 @@ GRANDstack is a combination of technologies that work together to enable develop
 - CSPS data consists of course/offering/registration/learner/survey/etc entities
 
 - `GRANDstack` is a combination of technologies that work together to enable developers to build `data intensive full stack applications`.
+
+#### For more information:
+- [Hands-on](/session_8/README.md)
