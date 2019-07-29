@@ -65,7 +65,7 @@ let id = 2;
 //   id++;
 // }, 1000);
 
-const kafkaTopics = ["json-topic", "avro-topic"];
+const kafkaTopics = ["json-topic", "avro-topic", "x.people", "x.relation"];
 
 const consumerConfiguration = {
     noptions: {
