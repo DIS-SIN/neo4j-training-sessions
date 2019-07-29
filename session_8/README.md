@@ -276,3 +276,9 @@ Now start a console producer:
         java -jar neo4j-streams-sink-tester-1.0.jar -t my-topic -f AVRO -e 50
 
   It should appear on `valhalla` page
+
+#### D. The panorama
+
+    ./visualize_docker_graph.sh
+
+![graph of dockers](doc_images/docker-compose.png)    
