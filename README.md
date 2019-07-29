@@ -222,4 +222,12 @@ GRANDstack is a combination of technologies that work together to enable develop
 #### For more information:
 - [Hands-on](/session_7/README.md)
 
+---
 
+## Session 8: Streaming and visualizing data
+
+### Demonstrating concepts of streaming and visualizing data
+
+- CSPS data consists of course/offering/registration/learner/survey/etc entities
+
+- `GRANDstack` is a combination of technologies that work together to enable developers to build `data intensive full stack applications`.
