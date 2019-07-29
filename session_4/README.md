@@ -66,7 +66,7 @@
         curl -X POST http://localhost:8083/connectors \
           -H 'Content-Type:application/json' \
           -H 'Accept:application/json' \
-          -d @contrib.sink.avro.neo4j.json
+          -d @contrib.sink.avro.neo4j.json.template
 
         {  
           "name":"Neo4jSinkConnector",
