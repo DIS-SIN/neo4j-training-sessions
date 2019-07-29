@@ -6,6 +6,6 @@ WORKDIR /app
 COPY package.json .
 RUN npm install --no-optional && npm install -g nc
 COPY . .
-RUN chmod +x nc_for_neo4j.sh
+RUN chmod +x wait_for_jotunheimr.sh
 
 EXPOSE 4000

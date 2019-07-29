@@ -160,9 +160,15 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
     docker-compose up -d --build gungnir
 
-- Test if GraphQL *augmented schema* is working:
+Test if GraphQL *augmented schema* is working:
+- First, download the `Electron`-based [`GraphiQL.app`](https://electronjs.org/apps/graphiql). Follow installation instructions.
+- Start the app, click on `Edit HTTP Headers`, `Add Header`.
+  + Type: `Authorization` into `Header name` and `Basic bmVvNGo6IyNkaXNAZGEyMDE5IyM=` into `Header value`.
+  + If you are not using default password, you can generate a `based64` encoded string by running this in the shell:
 
-  Use `GraphiQL` app at endpoint "http://localhost:4000/", with query `CoursesOfInstructor` defined as custom query in `gungnir`:
+        echo "Basic $(echo -n "neo4j:<neo4j_password>" | base64)"
+
+- Use `GraphiQL` app at endpoint "http://localhost:4000/", with query `CoursesOfInstructor` defined as custom query in `gungnir`:
 
       query q($instructor_name: String!) {
       	CoursesOfInstructor(name: $instructor_name) {
@@ -181,7 +187,7 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
   ![Test GraphQL augmented schema](doc_images/test-augmented-schema.png)
 
-  Query for instructors, using `neo4j-graphql-js` `auto-generated` `queries` and `mutations`;
+- Query for instructors, using `neo4j-graphql-js` `auto-generated` `queries` and `mutations`;
 
       query instructorPaginateQuery(
         $first: Int
@@ -223,3 +229,49 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
   Open the `Lucid` extension in `Developer Tools` and then direct the browser to `http://localhost:3000`.
 
 ![Test Lucid](doc_images/test-lucid.png)
+__
+
+#### 3. `gjallarhorn`
+
+    docker-compose up --build gjallarhorn
+    docker-compose up --build valhalla
+
+Now start a console producer:
+
+    ./test_json_producer.sh json-topic
+
+  (type a message, it should appear on `valhalla` page)
+
+#### 4. `jotunheimr` direct streaming
+
+  Navigate to `localhost:7474`, login if needed and type:
+
+    CALL streams.publish('my-topic', 'Hello World from Neo4j!')
+
+  It should appear on `valhalla` page
+
+#### 5. Streaming via `jotunheimr`
+
+  Configure the `Neo4jSinkConnector` with `connect`:
+
+    curl -X POST http://localhost:8083/connectors \
+      -H 'Content-Type:application/json' \
+      -H 'Accept:application/json' \
+      -d @contrib.sink.avro.neo4j.json.template
+
+  Perform testing:
+
+  - Download [neo4j-streams-sink-tester-1.0](https://github.com/conker84/neo4j-streams-sink-tester/releases/download/1/neo4j-streams-sink-tester-1.0.jar)
+
+  - Use browser and login with password `##dis@da2019##` to `neo4j` at http://localhost:7474/browser/.
+
+  - Create constraint and index to make persistence operation faster:
+
+        CREATE INDEX ON :Person(surname);
+        CREATE CONSTRAINT ON (f:Family) ASSERT f.name IS UNIQUE;
+
+  - Run test:
+
+        java -jar neo4j-streams-sink-tester-1.0.jar -t my-topic -f AVRO -e 50
+
+  It should appear on `valhalla` page

@@ -94,24 +94,24 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        // <Query query={GET_MESSAGES} client={subscription_client}>
-        //   {({ data, loading, subscribeToMore }) => {
-        //     if (!data) {
-        //       return null;
-        //     }
-        //
-        //     if (loading) {
-        //       return <span>Loading ...</span>;
-        //     }
-        //
-        //     return (
-        //       <Messages
-        //         messages={data.messages}
-        //         subscribeToMore={subscribeToMore}
-        //       />
-        //     );
-        //   }}
-        // </Query>
+        <Query query={GET_MESSAGES} client={subscription_client}>
+          {({ data, loading, subscribeToMore }) => {
+            if (!data) {
+              return null;
+            }
+
+            if (loading) {
+              return <span>Loading ...</span>;
+            }
+
+            return (
+              <Messages
+                messages={data.messages}
+                subscribeToMore={subscribeToMore}
+              />
+            );
+          }}
+        </Query>
 
         <CourseList />
       </div>
