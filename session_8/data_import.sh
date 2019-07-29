@@ -14,7 +14,7 @@ if [ $# -lt 2 ]; then
   echo "      ./data_import.sh i: import data only"
   echo "      ./data_import.sh a: after import processing only"
   echo "      ./data_import.sh s: export statistics only"
-  echo "      ./data_import.sh rneis: run a n -> e -> i -> a -> s pipeline"
+  echo "      ./data_import.sh neias: run a n -> e -> i -> a -> s pipeline"
   exit
 fi
 
@@ -163,11 +163,11 @@ if [[ $commands == *"s"* ]]; then
     sudo mkdir $NEO4J_DIR/import/csps/reports
     printf "Grant access ...\n"
     sudo chmod 777 $NEO4J_DIR/import/csps/reports
-
-    printf "Export statistics ...\n"
-    (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < import_scripts/export_statistics.cql
-    printf "Done.\n"
   fi
+
+  printf "Export statistics ...\n"
+  (docker exec -i $CONTAINER_NAME /var/lib/neo4j/bin/cypher-shell -u $USER_NAME -p $PASSWORD -a bolt://$BOLT_HOST_PORT) < import_scripts/export_statistics.cql
+  printf "Done.\n"
 fi
 
 res2=$(date +%s)
