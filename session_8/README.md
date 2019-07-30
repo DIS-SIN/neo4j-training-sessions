@@ -139,7 +139,7 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
 - Perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department:
 
-      ./data_import.sh
+      ./data_import.sh neias ~/neo4j
 
 #### C. Norse mythology
 
