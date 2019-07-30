@@ -12,6 +12,6 @@
     "neo4j.authentication.basic.username": "neo4j",
     "neo4j.authentication.basic.password": "##dis@da2019##",
     "neo4j.encryption.enabled": false,
-    "neo4j.topic.cypher.my-topic": "MERGE (p:Person{name: event.name, surname: event.surname}) MERGE (f:Family{name: event.surname}) MERGE (p)-[:BELONGS_TO]->(f) WITH p CALL streams.publish('json-topic', apoc.convert.toJson({name: p.name, surname: p.surname})) RETURN p"
+    "neo4j.topic.cypher.my-topic": "MERGE (p:Person{name: event.name, surname: event.surname}) MERGE (f:Family{name: event.surname}) MERGE (p)-[:BELONGS_TO]->(f) WITH p CALL streams.publish('avro-topic', {name: p.name, surname: p.surname}) RETURN p"
   }
 }

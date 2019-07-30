@@ -94,12 +94,11 @@ const batchOptions = {
     consumer.consume(async (messages, callback) => {
         // deal with array of messages
         // and when your done call the callback to commit (depending on your batch settings)
-        console.log(messages);
-
         messages.forEach(function(message) {
           pubsub.publish(MESSAGE_CREATED, {
-            messageCreated: { id, content: message.value.toString() },
+            messageCreated: { id, content: message.value },
           });
+          console.log(message);
           id++;
         });
 
