@@ -125,6 +125,8 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
       docker-compose build jotunheimr
 
+##### 2.1 Using `neo4j-admin` high-performance `import`
+
 - Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-), uncompress, and place the `*.tsv` files in `~/neo4j/import/csps`.
 
 - Make sure that `python3` is installed and executable. If you use python virtual environment, for example at `~3.7.4`, enable it:
@@ -140,6 +142,14 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 - Perform data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department:
 
       ./data_import.sh neias ~/neo4j
+
+##### 2.2 Using `LOAD CSV` for import
+
+- Download the [scraped data](https://drive.google.com/open?id=1L_qXTCLYg_Dc4E4FY9cCZ8_RXHSWDKT-), uncompress, and place the `*.tsv` files in `~/neo4j/import/csps`.
+
+- Perform a full import directly from `*.tsv` files and performing data normalization, preparation, import, temporal data conversion, as well as entity extractions for incomplete data of GoC occupation classification & department:
+
+      ./tsv_import.sh
 
 #### C. Norse mythology
 
