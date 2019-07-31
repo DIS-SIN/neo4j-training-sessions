@@ -1,5 +1,7 @@
 #!/bin/bash
 
+res1=$(date +%s)
+
 export MSYS_NO_PATHCONV=1
 
 BOLT_HOST_PORT=localhost:7687
