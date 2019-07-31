@@ -122,9 +122,9 @@ For more information: [Kafka Connect Neo4j Sink](https://www.confluent.io/connec
 
 #### 2. Getting the CSPS course/registration/survey database ready:
 
-- Start `jotunheimr`
+- Build all dockers
 
-      docker-compose build jotunheimr
+      docker-compose build
 
 ##### 2.1 Using `neo4j-admin` high-performance `import`
 
