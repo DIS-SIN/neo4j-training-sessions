@@ -54,12 +54,12 @@ CURRENT=$PWD
 if [[ $commands == *"i"* ]]; then
 
   source ./set_env.sh \
-    && docker-compose down \
+    && docker-compose -f docker-compose.yml.with-plugin down \
     && sudo rm -f neo4j/logs/import_report.log \
     && cd neo4j/data \
     && sudo rm -rf databases \
     && cd $CURRENT \
-    && docker-compose up -d
+    && docker-compose -f docker-compose.yml.with-plugin up -d
 
   echo 'Wait for Neo4j ...'
   end="$((SECONDS+300))"
@@ -115,13 +115,13 @@ if [[ $commands == *"i"* ]]; then
   fi
 
   source ./set_env.sh \
-    && docker-compose down \
+    && docker-compose -f docker-compose.yml.with-plugin down \
     && cd neo4j/data \
     && sudo rm -rf databases/graph.db \
     && sudo mv databases/csps_survey databases/graph.db \
     && sudo chmod -R 777 databases \
     && cd $CURRENT \
-    && docker-compose up -d
+    && docker-compose -f docker-compose.yml.with-plugin up -d
 
   echo 'Wait for Neo4j ...'
   end="$((SECONDS+300))"
@@ -160,11 +160,11 @@ fi
 if [[ $commands == *"b"* ]]; then
 
   source ./set_env.sh \
-    && docker-compose down \
+    && docker-compose -f docker-compose.yml.with-plugin down \
     && cd neo4j/data \
     && tar czvf $TEMPORARY_DIRECTORY/csps_survey_gdb.tar.gz databases \
     && cd $CURRENT \
-    && docker-compose up -d
+    && docker-compose -f docker-compose.yml.with-plugin up -d
 
   echo 'Wait for Neo4j ...'
   end="$((SECONDS+300))"

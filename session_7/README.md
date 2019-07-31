@@ -73,7 +73,7 @@
 
 - First, download the `Electron`-based [`GraphiQL.app`](https://electronjs.org/apps/graphiql). Follow installation instructions.
 
-- Start the app, click on `Edit HTTP Headers`, `Add Header`.
+- Start the app, navigate to 'http://localhost:7474/graphql/', click on `Edit HTTP Headers`, `Add Header`.
   + Type: `Authorization` into `Header name` and `Basic bmVvNGo6IyNkaXNAZGEyMDE5IyM=` into `Header value`.
   + If you are not using default password, you can generate a `based64` encoded string by running this in the shell:
 
@@ -223,7 +223,7 @@
         ./cleanup_docker.sh docker-compose.yml.with-plugin
 
   (optional)
-  
+
         ./data_task.sh ib
 
 2. Start `neo4j-session-7` and `apollo-server` docker containers:
