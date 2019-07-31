@@ -45,8 +45,9 @@ services:
       - mimir
     depends_on:
       - jotunheimr
-    command: ["./wait_for_jotunheimr.sh", "jotunheimr", "npm", "start"]
-
+    # Temporarily commented out for Windows
+    # command: ["./wait_for_jotunheimr.sh", "jotunheimr", "npm", "start"]
+    
   ####################
   # gjallarhorn
   #
