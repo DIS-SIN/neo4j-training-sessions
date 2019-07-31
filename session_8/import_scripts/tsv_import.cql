@@ -136,13 +136,10 @@ CALL apoc.periodic.iterate("
     MATCH (o:Offering {uid: map.offering_id})
       MERGE (c)-[:COURSE_OF]->(o)
   WITH map, o
-    MATCH (ol:Language {uid: map.offering_language})
+    MATCH (ol:Language {uid: map.offering_language}), (oc:City {name: map.offering_city}), (op:Provice {name: map.offering_province}), (or:Region {name: map.offering_region})
       MERGE (ol)-[:LANGUAGE_OF]->(o)
-    MATCH (oc:City {name: map.offering_city})
       MERGE (oc)-[:OFFERED_IN]->(o)
-    MATCH (op:Provice {name: map.offering_province})
       MERGE (op)-[:PROVINCE_OF]->(oc)
-    MATCH (or:Region {name: map.offering_region})
       MERGE (or)-[:REGION_OF]->(op)
   WITH map, o
     MERGE (r:Registration {uid: map.reg_id})
