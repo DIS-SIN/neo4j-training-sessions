@@ -34,7 +34,7 @@ class CourseList extends React.Component {
       order: "asc",
       orderBy: "code",
       page: 0,
-      rowsPerPage: 10
+      rowsPerPage: 500
     };
   }
 
@@ -63,6 +63,9 @@ class CourseList extends React.Component {
               _id
               code
               title
+              course_of {
+                uid
+              }
             }
           }
         `}
@@ -117,6 +120,7 @@ class CourseList extends React.Component {
                         </TableSortLabel>
                       </Tooltip>
                     </TableCell>
+                    <TableCell>Start date</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -127,6 +131,7 @@ class CourseList extends React.Component {
                           {n.code}
                         </TableCell>
                         <TableCell>{n.title}</TableCell>
+                        <TableCell>{n.course_of.length}</TableCell>
                       </TableRow>
                     );
                   })}
