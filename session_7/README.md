@@ -19,7 +19,7 @@
 
         source ./set_env.sh
 
-- *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1hq8GLQYRRDwH2oKzeebdxU-kznIiCsAc), uncompress, and place it under `neo4j/data` as `database`. Run:
+- *Option 1* (preferable for Windows): Download a [copy of the database](https://drive.google.com/open?id=1CxoCHEOYOh-cgW6Dcs21araug7lmD1Y0), uncompress, and place it under `neo4j/data` as `database`. Run:
 
         docker-compose -f docker-compose.yml.with-plugin up
 
