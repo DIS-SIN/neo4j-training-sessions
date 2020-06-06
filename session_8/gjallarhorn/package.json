@@ -11,7 +11,7 @@
   "author": "“Robin <rwieruch@fastmail.com> (https://www.robinwieruch.de)",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^2.7.1",
+    "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.7.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
