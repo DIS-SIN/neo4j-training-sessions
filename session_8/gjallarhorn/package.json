@@ -25,7 +25,7 @@
     "nodemon": "^1.19.1",
     "chokidar": "^3.0.2",
     "mixin-deep": "^2.0.1",
-    "set-value": "^3.0.1",
+    "set-value": "^4.0.1",
     "braces": "^3.0.2",
     "lodash": "^4.17.15"
   }
